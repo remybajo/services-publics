@@ -222,11 +222,6 @@ def page_presse(tete, menu):
 def page_methode(tete, menu):
     lignes = "".join(f'<tr><td>{t}</td><td>{p}</td><td><a href="{u}">{ti}</a></td><td>{li}</td><td>{dt}</td></tr>' for t, p, ti, u, li, dt in SOURCES)
     corps = f"""
-<section id="chaine">
-  <h2>Comment les chiffres sont produits</h2>
-  <p>Chaque rapport repose sur des données publiques téléchargées telles quelles chez leur producteur. Un script nettoie ces fichiers sans correction à la main : les valeurs manquantes ou suspectes sont signalées, pas supprimées. Un second script calcule chaque chiffre à partir des fichiers nettoyés et l'enregistre avec sa définition. Un troisième produit la page à partir de ces calculs : aucun chiffre n'est saisi à la main dans les textes.</p>
-  <p>Les limites de chaque donnée figurent à côté du chiffre concerné et dans la section « Fiabilité » de chaque rapport. Les encadrés « Notre lecture » signalent les interprétations.</p>
-</section>
 <section id="reproduire">
   <h2>Reproduire les calculs</h2>
   <p>Le code est public. Avec Python 3 et sans autre dépendance, après avoir placé les fichiers sources dans <code>donnees_brutes/</code> :</p>
