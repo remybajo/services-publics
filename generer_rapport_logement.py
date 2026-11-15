@@ -12,12 +12,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # modules du projet
 from graphiques_svg import (STYLE_MILITANT, barres_groupees, barres_h, casse_en_chiffres, courbes, d, lecture,  # noqa: E402
                             limite, n, pct, section)
-from graphiques_svg import alleger_limites  # noqa: E402
+from graphiques_svg import alleger_limites, barres_divergentes, limite  # noqa: E402
+CP = json.load(open("donnees_propres/comparaisons/chiffres_comparaisons.json", encoding="utf-8"))  # comparaisons : population, Europe, OCDE
 from cartes_svg import STYLE_CARTE, carte_departements, section_carte  # noqa: E402
 
 FICHE = "donnees_propres/logement/chiffres_logement.json"
 MODELE_STYLE = "rapport_lots.html"
-SORTIE = "rapport_logement.html"
+SORTIE = "rapports/rapport_logement.html"
 BROUILLON = "--brouillon" in sys.argv
 
 C = json.load(open(FICHE, encoding="utf-8"))
@@ -169,12 +170,12 @@ tableau = f"""
 
 # --- Synthèse, fiabilité, sources, assemblage ----------------------------------------------------
 casse = casse_en_chiffres("La casse en chiffres", [
-    f"<strong>{pct(PA['mises_en_service_vs_pic']['pct'])}</strong> de logements sociaux mis en service en {der['annee_mise_en_service']} par rapport à {pic['annee_mise_en_service']} ({n(pic['valeur'])} → {n(der['valeur'])}, France métropolitaine) ; en moyenne annuelle (2022-2024 contre 2013-2015), baisse dans {DE['deps_mises_en_service_en_baisse']} départements sur {len(DE['departements'])}.",
+    f"<strong>{pct(PA['mises_en_service_vs_pic']['pct'])}</strong> de logements sociaux mis en service en {der['annee_mise_en_service']} par rapport à {pic['annee_mise_en_service']} ({n(pic['valeur'])} → {n(der['valeur'])}, France métropolitaine), {pct(CP['logement']['mises_en_service_pour_10000']['pct'])} par habitant par rapport à {pic['annee_mise_en_service']}, année la plus haute de la période ; en moyenne annuelle (2022-2024 contre 2013-2015), baisse dans {DE['deps_mises_en_service_en_baisse']} départements sur {len(DE['departements'])}.",
     f"En {s25['annee_des_sorties']}, en France métropolitaine, <strong>{n(s25['demolitions_et_ventes_occupant_et_autres'])} logements sociaux</strong> démolis ou vendus à leur occupant ou à d'autres acquéreurs, soit {d(s25['pour_100_mises_en_service'], 0)} pour 100 mis en service.",
     f"<strong>{md(-AI['montant_2017_2025']['ecart'])}</strong> d'aides personnelles au logement en moins entre 2017 et {sa[-1]['annee']} (France entière, euros courants), et {n(-AI['beneficiaires_2017_2025']['ecart_milliers'])} milliers de bénéficiaires en moins.",
     f"<strong>{n(-CA['foyers']['ecart'])} foyers</strong> aidés de moins par les Caf entre mars 2017 et mars 2026 (France entière) ; baisse dans {CA['territoires_en_baisse']} territoires sur {CA['nb_territoires']}.",
     f"<strong>{n(sd['deficitaires_marquees'])} communes</strong> sur {n(sd['communes_sru'])} déficitaires au sens de la loi SRU (inventaire {sd['millesime']}, France entière), dont {n(sd['carencees'])} carencées.",
-], note=f"« Casse » : notre lecture de ces évolutions. Elles ne disent pas tout : le parc social continue de croître ({pct(PA['parc']['pct'])} depuis 2013, rupture de série en 2023), les mises en service progressent en {se[-2]['annee_mise_en_service']} et {der['annee_mise_en_service']} ({n(se[-3]['mises_en_service'])} → {n(der['valeur'])}) et dépassent leur point bas de {bas['annee_mise_en_service']} ({n(bas['mises_en_service'])}), le montant moyen des allocations logement augmente, et l'ensemble des aides au logement (avantages fiscaux compris) progresse. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
+], note=f"« Casse » : notre lecture de ces évolutions. Le parc social continue toutefois de croître ({pct(PA['parc']['pct'])} depuis 2013, rupture de série en 2023 ; {n(PA['hausse_parc_derniere_annee'])} logements de plus en un an). Les mises en service progressent en {se[-2]['annee_mise_en_service']} et {der['annee_mise_en_service']} ({n(se[-3]['mises_en_service'])} → {n(der['valeur'])}) sans retrouver leur niveau du milieu des années 2010. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
 
 fiab = f"""
 <section id="fiabilite">
@@ -189,6 +190,7 @@ fiab = f"""
     <tr><td>Aides personnelles (compte du logement)</td><td>Euros courants ; causes des évolutions non documentées</td><td>Pas de calcul en euros constants</td></tr>
     <tr><td>Aides au logement (Cnaf)</td><td>Allocataires des Caf ; département de résidence ; mois de décembre incomplets certaines années</td><td>Comparaison des seuls mois de mars</td></tr>
     <tr><td>Absent des données ouvertes</td><td>Demande de logement social et délais d'attente, droit au logement opposable, hébergement d'urgence (pas de données ouvertes nationales trouvées) ; expulsions non traitées</td><td>Non traités dans ce rapport</td></tr>
+      <tr><td>Rapport à la population (Insee)</td><td>Estimations de population au 1er janvier, années récentes provisoires</td><td>Ratios par habitant susceptibles de légères révisions</td></tr>
   </table></div>
 </section>"""
 date = open("donnees_brutes/logement/date_telechargement.txt", encoding="utf-8").read().strip()
@@ -196,7 +198,8 @@ sources = f"""
 <section>
   <h3>Sources</h3>
   <p>Service des données et études statistiques (SDES, ministère de la Transition écologique ; licence ouverte selon les <a href="https://www.statistiques.developpement-durable.gouv.fr/mentions-legales">mentions légales du site du SDES</a>) : répertoire des logements locatifs des bailleurs sociaux (RPLS), résultats au 1er janvier 2024 et 2025 ; compte du logement 2025, séries longues des aides 1984-2025. Ministère chargé du logement : inventaire des communes soumises à la loi SRU, millésimes 2023 à 2026 (data.gouv.fr, Licence Ouverte). Caisse nationale des allocations familiales : aides au logement par département et type de parc (data.caf.fr, Licence Ouverte). Téléchargement du {date}.</p>
-  <p>Calculs rejouables : <code>nettoyer_logement.py</code>, <code>calculer_chiffres_logement.py</code> puis <code>generer_rapport_logement.py</code>.</p>
+  <p>Population : Insee, estimations localisées de population au 1er janvier (Licence Ouverte).</p>
+  <p>Calculs rejouables : <code>calculer_chiffres_comparaisons.py</code> (comparaisons), <code>nettoyer_logement.py</code>, <code>calculer_chiffres_logement.py</code> puis <code>generer_rapport_logement.py</code>.</p>
 </section>"""
 bandeau = ('<div class="take" style="border-color:var(--warn)"><strong>Brouillon en cours de vérification</strong> : '
            'chiffres non encore validés de façon indépendante, ne pas diffuser.</div>') if BROUILLON else ""
@@ -233,22 +236,33 @@ s_carte = section_carte("La carte", "Le logement social, département par dépar
   <p class="limite"><strong>Limites :</strong> classes de couleur = cinquièmes des départements ; mises en service et parc social : France métropolitaine seulement (RPLS), avec des pourcentages fragiles dans les départements qui mettent peu de logements en service ; communes SRU : nombres absolus, qui dépendent du nombre de communes soumises à la loi ; départements sans commune soumise à la loi SRU en gris.</p>""")
 
 
+# --- Comparaisons : mises en service rapportées à la population (Insee) -------------------------------------
+CL = CP["logement"]
+g_hab = barres_groupees([(CL["annees"][0], [CL["mises_en_service_pour_10000"]["debut"]]), (CL["annees"][1], [CL["mises_en_service_pour_10000"]["fin"]])],
+                        ["var(--alerte)"], 15, 5, lambda v: d(v, 1), "Logements sociaux mis en service pour 10 000 habitants (France métropolitaine)")
+s_hab = section("0", "Rapporté à la population", f"{d(CL['mises_en_service_pour_10000']['fin'], 1)} logements sociaux mis en service pour 10 000 habitants en {CL['annees'][1]}, contre {d(CL['mises_en_service_pour_10000']['debut'], 1)} en {CL['annees'][0]}", g_hab, f"""
+  <p class="take">La population de France métropolitaine augmente ({pct(CL['population_metropole']['pct'])} entre {CL['annees'][0]} et {CL['annees'][1]}) pendant que les mises en service reculent : <strong>{pct(CL['mises_en_service_pour_10000']['pct'])}</strong> de logements sociaux mis en service par habitant.</p>
+  {limite("mises en service de l'année (RPLS) rapportées à la population de France métropolitaine au 1er janvier de la même année (Insee, estimations ; 2024 provisoire).")}""")
+
+
 def partie(ident, titre, intro):
     return f'<div class="partie" id="{ident}"><div class="eyebrow">{titre}</div><p class="lead">{intro}</p></div>'
 
 
 PARTIES = [
-    ("construire", "Construire", "Combien de logements sociaux arrivent chaque année.", [s_mes, s_parc, s_dep]),
+    ("construire", "Construire", "Combien de logements sociaux arrivent chaque année.", [s_mes, s_hab, s_dep]),
     ("sortir", "Vendre et démolir", "Les logements qui quittent le parc social.", [s_sort]),
     ("sru", "La loi SRU", "Les communes déficitaires au regard de la loi SRU.", [s_sru]),
     ("aides", "Aider les locataires", "Les aides personnelles au logement.", [s_aides, s_caf]),
 ]
 sommaire = ('<nav class="sommaire" aria-label="Sommaire">' + "".join(f'<a href="#{i}">{t}</a>' for i, t, _, _ in PARTIES)
             + '<a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav>')
-corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + s_carte + tableau + fiab
+corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + tableau + fiab
 compteur = iter(range(1, 100))
 corps = re.sub(r"<h3>\d+ · ", lambda _: f"<h3>{next(compteur)} · ", corps)
 corps = alleger_limites(corps)  # version presse : limites repliables, jamais supprimées
+carte_haut = alleger_limites(re.sub(r"<h3>0 · ", "<h3>", s_carte))  # carte en tête de page, juste après l'en-tête
+entete = entete.replace("</header>", "</header>" + carte_haut, 1)
 
 STYLE_SUPPL = """<style>
 :root { --s3: #1f9e89; --s4: #8a5cd6; --s5: #c99a06; --s6: #c2417a; }

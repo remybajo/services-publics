@@ -15,7 +15,7 @@ from cartes_svg import STYLE_CARTE, carte_departements, section_carte  # noqa: E
 
 FICHE = "donnees_propres/territoires/chiffres_territoires.json"
 MODELE_STYLE = "rapport_lots.html"
-SORTIE = "rapport_territoires.html"
+SORTIE = "rapports/rapport_territoires.html"
 
 C = json.load(open(FICHE, encoding="utf-8"))
 IND, DEPS = C["indicateurs"], C["departements"]
@@ -199,10 +199,12 @@ entete = f"""
 
 sommaire = ('<nav class="sommaire" aria-label="Sommaire"><a href="#carte">La carte</a><a href="#ecarts">Les écarts</a>'
             '<a href="#departements">Votre département</a><a href="#fiabilite">Méthode</a></nav>')
-corps = s_carte + s_cl + s_ecarts + tableau + fiab
+corps = s_cl + s_ecarts + tableau + fiab
 compteur = iter(range(1, 100))
 corps = re.sub(r"<h3>\d+ · ", lambda _: f"<h3>{next(compteur)} · ", corps)
 corps = alleger_limites(corps)  # version presse : limites repliables, jamais supprimées
+carte_haut = alleger_limites(re.sub(r"<h3>0 · ", "<h3>", s_carte))  # carte en tête de page, juste après l'en-tête
+entete = entete.replace("</header>", "</header>" + carte_haut, 1)
 
 STYLE_SUPPL = """<style>
 .sommaire { display: flex; flex-wrap: wrap; gap: 8px; }

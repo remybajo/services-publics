@@ -12,12 +12,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # modules du projet
 from graphiques_svg import (STYLE_MILITANT, barres_groupees, barres_h, casse_en_chiffres, d, empile_100_h,  # noqa: E402
                             lecture, legende, limite, n, pct, section)
-from graphiques_svg import alleger_limites  # noqa: E402
+from graphiques_svg import alleger_limites, barres_divergentes, limite  # noqa: E402
+CP = json.load(open("donnees_propres/comparaisons/chiffres_comparaisons.json", encoding="utf-8"))  # comparaisons : population, Europe, OCDE
 from cartes_svg import STYLE_CARTE, carte_departements, section_carte  # noqa: E402
 
 FICHE = "donnees_propres/poste/chiffres_poste.json"
 MODELE_STYLE = "rapport_lots.html"
-SORTIE = "rapport_poste.html"
+SORTIE = "rapports/rapport_poste.html"
 BROUILLON = "--brouillon" in sys.argv
 
 C = json.load(open(FICHE, encoding="utf-8"))
@@ -123,7 +124,7 @@ s_hdep = section("0", "Ouverture par territoire", f"{top_h[0]['nom']} : {d(top_h
   {limite("horaires prévus par La Poste du 19/10/2026 au 18/01/2027 (médiane sur 13 semaines), points dont les horaires sont connus (relais : 90,8&nbsp;% couverts) ; points partenaires exclus.")}""")
 
 casse = casse_en_chiffres("La casse en chiffres", [
-    f"<strong>Près d'un bureau de poste sur trois a disparu</strong> en dix ans : {n(eb['Bureau de poste']['debut'])} en {a0}, {n(eb['Bureau de poste']['fin'])} en {a1} ({pct(eb['Bureau de poste']['pct'])}).",
+    f"<strong>Près d'un bureau de poste sur trois a disparu</strong> en dix ans : {n(eb['Bureau de poste']['debut'])} en {a0}, {n(eb['Bureau de poste']['fin'])} en {a1} ({pct(eb['Bureau de poste']['pct'])}) ; {d(CP['poste']['bureaux_pour_100000']['fin'])} bureaux pour 100 000 habitants contre {d(CP['poste']['bureaux_pour_100000']['debut'])} ({pct(CP['poste']['bureaux_pour_100000']['pct'])}).",
     f"Les bureaux de La Poste ne sont plus que <strong>{d(s2['part_bureaux'], 0)}&nbsp;%</strong> des points postaux (contre {d(s0['part_bureaux'], 0)}&nbsp;% en {a0}) ; le reste est tenu par des communes, des intercommunalités ou des commerçants.",
     f"Dans <strong>{EV['deps_minorite_bureaux']} départements</strong> sur {len(deps)}, les bureaux sont devenus minoritaires parmi les points postaux, contre {EV['deps_minorite_bureaux_debut']} en {a0}.",
 ], note=f"Évolutions {a0}-{a1} (Insee). Le nombre total de points postaux, lui, est presque stable ({pct(EV['total']['pct'])}) : ce qui recule, c'est le bureau tenu par La Poste. Détail, sources et limites dans la suite du rapport.")
@@ -196,6 +197,7 @@ fiab = f"""
     <tr><td>Corrections tracées</td><td>4 bureaux de Monaco exclus ; code commune d'Orée d'Anjou corrigé ; 88 communes sans point ni boîte (13 267 habitants), codes communes peut-être obsolètes</td><td>Effet négligeable sur les totaux</td></tr>
     <tr><td>Population sans bureau (2026)</td><td>Points La Poste 2026 et population 2022 par commune ; ni distance ni temps d'accès ; unité commune très inégale</td><td>Mesure l'absence de bureau dans la commune, pas l'éloignement</td></tr>
     <tr><td>Rapport intégré</td><td>Chiffres publiés par l'entreprise, une seule année</td><td>Non vérifiables à partir d'une autre source</td></tr>
+      <tr><td>Rapport à la population (Insee)</td><td>Estimations de population au 1er janvier, années récentes provisoires</td><td>Ratios par habitant susceptibles de légères révisions</td></tr>
   </table></div>
 </section>"""
 date = open("donnees_brutes/poste/date_telechargement.txt", encoding="utf-8").read().strip()
@@ -203,7 +205,8 @@ sources = f"""
 <section>
   <h3>Sources</h3>
   <p>Insee, Base permanente des équipements, jeu d'évolution 2015-2020-2025 (API Melodi, Licence Ouverte) ; Insee, <a href="https://www.insee.fr/fr/metadonnees/source/fichier/BPE16_21_Precautions_utilisation.pdf">BPE en évolution 2016-2021, précautions d'utilisation</a>. La Poste (data.laposte.fr) : liste des bureaux de poste, agences postales et relais poste (Licence Ouverte) ; calendrier d'ouverture et liste des boîtes aux lettres de rue (ODbL) ; rapport intégré 2025 (Licence Ouverte). Population : « population totale 2022 » du fichier APL 2024 de la DREES (Licence Ouverte). Téléchargement du {date}.</p>
-  <p>Calculs rejouables : <code>nettoyer_poste.py</code>, <code>calculer_chiffres_poste.py</code> puis <code>generer_rapport_poste.py</code>.</p>
+  <p>Population : Insee, estimations localisées de population au 1er janvier (Licence Ouverte).</p>
+  <p>Calculs rejouables : <code>calculer_chiffres_comparaisons.py</code> (comparaisons), <code>nettoyer_poste.py</code>, <code>calculer_chiffres_poste.py</code> puis <code>generer_rapport_poste.py</code>.</p>
 </section>"""
 bandeau = ('<div class="take" style="border-color:var(--warn)"><strong>Brouillon en cours de vérification</strong> : '
            'chiffres non encore validés de façon indépendante, ne pas diffuser.</div>') if BROUILLON else ""
@@ -245,22 +248,35 @@ s_carte = section_carte("La carte", "La présence postale, département par dép
   <p class="limite"><strong>Limites :</strong> classes de couleur = cinquièmes des départements ; les deux premiers indicateurs viennent de l'Insee (2015-2025), les deux suivants de La Poste (2026) et ne se comparent pas entre eux ; « sans bureau » ne mesure ni la distance ni le temps d'accès.</p>""")
 
 
+# --- Comparaisons : bureaux de poste rapportés à la population (Insee) -------------------------------------
+CPO = CP["poste"]
+hab = sorted(CPO["par_departement"].items(), key=lambda kv: kv[1]["pct"])[:15]
+g_hab = barres_h([(o["nom"], -o["pct"]) for _, o in hab], lambda v: "−" + d(v) + "&nbsp;%",
+                 f"Baisse du nombre de bureaux de poste pour 100 000 habitants, {CPO['periode'][0]}-{CPO['periode'][1]}", couleur="var(--alerte)", vmax=60)
+s_hab = section("0", "Rapporté à la population", f"{d(CPO['bureaux_pour_100000']['fin'])} bureaux de poste pour 100 000 habitants, contre {d(CPO['bureaux_pour_100000']['debut'])} en {CPO['periode'][0]}", g_hab, f"""
+  <p class="take">La population augmente ({pct(CPO['population']['pct'])} entre {CPO['periode'][0]} et {CPO['periode'][1]}) pendant que les bureaux de poste disparaissent : on passe de {d(CPO['bureaux_pour_100000']['debut'])} à <strong>{d(CPO['bureaux_pour_100000']['fin'])} bureaux pour 100 000 habitants</strong> ({pct(CPO['bureaux_pour_100000']['pct'])}).</p>
+  <p>Les plus fortes baisses par habitant : {hab[0][1]['nom']} ({pct(hab[0][1]['pct'])}), {hab[1][1]['nom']} ({pct(hab[1][1]['pct'])}), {hab[2][1]['nom']} ({pct(hab[2][1]['pct'])}).</p>
+  {limite(f"bureaux de poste au 1er janvier (Insee, BPE) rapportés à la population au 1er janvier de la même année (Insee, estimations ; {CPO['periode'][1]} provisoire).")}""")
+
+
 def partie(ident, titre, intro):
     return f'<div class="partie" id="{ident}"><div class="eyebrow">{titre}</div><p class="lead">{intro}</p></div>'
 
 
 PARTIES = [
-    ("reseau", "Le réseau", "Bureaux de poste, agences postales et relais.", [s_res, s_part, s_dep, s_pop]),
+    ("reseau", "Le réseau", "Bureaux de poste, agences postales et relais.", [s_res, s_hab, s_part, s_dep, s_pop]),
     ("ouverture", "L'ouverture au public", "Heures d'ouverture des guichets.", [s_h, s_cl, s_hdep]),
     ("courrier", "Le courrier", "Les boîtes aux lettres de rue et les facteurs.", [s_bo, s_fac]),
 ]
 sommaire = ('<nav class="sommaire" aria-label="Sommaire">' + "".join(f'<a href="#{i}">{t}</a>' for i, t, _, _ in PARTIES)
             + '<a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav>')
-corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + s_carte + tableau + fiab
+corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + tableau + fiab
 corps = corps.replace("<p><strong>Limite", '<p class="limite"><strong>Limite')  # limites plus discrètes, toujours présentes
 compteur = iter(range(1, 100))
 corps = re.sub(r"<h3>\d+ · ", lambda _: f"<h3>{next(compteur)} · ", corps)
 corps = alleger_limites(corps)  # version presse : limites repliables, jamais supprimées
+carte_haut = alleger_limites(re.sub(r"<h3>0 · ", "<h3>", s_carte))  # carte en tête de page, juste après l'en-tête
+entete = entete.replace("</header>", "</header>" + carte_haut, 1)
 
 STYLE_SUPPL = """<style>
 :root { --s3: #1f9e89; --s4: #8a5cd6; --s5: #c99a06; --s6: #c2417a; }

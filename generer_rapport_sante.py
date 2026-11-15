@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # module graphiques_svg du projet
 FICHE = "donnees_propres/sante/chiffres_sante.json"
 MODELE_STYLE = "rapport_lots.html"
-SORTIE = "rapport_sante.html"
+SORTIE = "rapports/rapport_sante.html"
 
 C = json.load(open(FICHE, encoding="utf-8"))
 COUL = {"Public": "var(--s1)", "Privé non lucratif": "var(--dim)", "Privé lucratif": "var(--s2)"}
@@ -21,7 +21,8 @@ STATUTS = ["Public", "Privé non lucratif", "Privé lucratif"]
 from graphiques_svg import (D, G, H, HAUT, BAS, W, STYLE_MILITANT, axe_y, barres_divergentes, barres_empilees, barres_groupees,
                             barres_h, casse_en_chiffres, courbes, d, ecart, echelle, empile_100_h, legende, lecture, m, n, pct,
                             section, svg)
-from graphiques_svg import alleger_limites  # noqa: E402
+from graphiques_svg import alleger_limites, barres_divergentes, limite  # noqa: E402
+CP = json.load(open("donnees_propres/comparaisons/chiffres_comparaisons.json", encoding="utf-8"))  # comparaisons : population, Europe, OCDE
 from cartes_svg import STYLE_CARTE, carte_departements, section_carte  # noqa: E402
 
 
@@ -466,6 +467,7 @@ fiab = f"""
     <tr><td>Médecins (RPPS)</td><td>Inscrits à l'Ordre et actifs, quel que soit le temps de travail ; densité non calculée par la DREES pour Mayotte en 2012-2013 ; extraction 2024 réalisée au 30 septembre, activité au 1er janvier reconstituée par la DREES</td><td>Mesure le nombre de médecins, pas le temps médical disponible</td></tr>
     <tr><td>Comptes de la santé</td><td>Euros courants, non corrigés de l'inflation ; moyennes nationales ; séries révisées à chaque édition ; secteur public = hôpitaux publics, militaires et privés non lucratifs ex-dotation globale</td><td>Le reste à charge moyen masque de fortes différences entre personnes</td></tr>
     <tr><td>Taille des maternités</td><td>Accouchements des seules maternités ouvertes au 31 décembre</td><td>Ne permet pas de compter le total des accouchements</td></tr>
+      <tr><td>Comparaisons (Insee, Eurostat)</td><td>Population 2024 et 2025 provisoire ; rupture de série Eurostat en 2013 pour les lits ; définition européenne différente de la statistique française</td><td>Ratios par habitant indicatifs ; ne pas comparer les chiffres Eurostat et SAE entre eux</td></tr>
   </table></div>
   <p>Les séries nationales masquent de fortes différences entre territoires : les graphiques par département et le tableau en donnent un aperçu. Aucun indicateur n'est rapporté aux besoins de la population, sauf l'APL, qui tient compte de sa structure par âge ; selon la DREES, l'APL ne corrige pas le vieillissement entre deux millésimes.</p>
 </section>"""
@@ -477,18 +479,19 @@ sources = f"""
   <p>DREES, data.drees (téléchargement du {date}) : « Graphique 1 – Évolution du nombre de lits et de places au 31 décembre, depuis fin 2013 » ; « Effectifs salariés hospitaliers – Séries longues » ; « Lits de soins critiques des établissements de santé en France » ; « Liste des maternités de France depuis 2000 » ; « Accessibilité potentielle localisée (APL) aux professionnels de santé » ; « Séries longues corrigées du nombre de passages aux urgences 2017 à 2023 » ; « Base ARES – Agrégats régionaux sur les établissements de santé » (2013-2021) ; « La démographie des professionnels de santé depuis 2012 » (fichier Médecins RPPS 2012-2026) ; « Les comptes de la santé – Répartition par financeur » (édition 2026). Définition des secteurs public et privé hospitaliers : DREES, <a href="https://drees.solidarites-sante.gouv.fr/sites/default/files/2025-12/CNS%20-%20Fiche%2002%20-%20Les%20soins%20hospitaliers.pdf">Les dépenses de santé en 2024 (édition 2025), fiche « Les soins hospitaliers »</a>.</p>
   <p>Licences : Licence Ouverte v2.0 (Etalab) pour les effectifs, les maternités, l'APL, les urgences, la base ARES, la démographie des médecins et les comptes de la santé ; licence non renseignée pour les lits et places et pour les soins critiques.</p>
   <p>Commune sous-dotée en médecins généralistes (APL inférieur ou égal à {seuil} consultations par an et par habitant) : Insee, <a href="https://www.insee.fr/fr/statistiques/8677556">« L'accessibilité aux médecins généralistes se dégrade en Centre-Val de Loire »</a>, Insee Flash Centre-Val de Loire n° 101, décembre 2025 (même définition dans Insee Analyses Auvergne-Rhône-Alpes n° 187, décembre 2024).</p>
-  <p>Calculs rejouables : <code>nettoyer_sante.py</code>, <code>calculer_chiffres_sante.py</code> puis <code>generer_rapport_sante.py</code> ; chiffres vérifiés de façon indépendante à partir des fichiers bruts.</p>
+  <p>Population : Insee, estimations localisées de population (Licence Ouverte). Comparaison européenne : Eurostat, lits d'hôpital (hlth_rs_bds1) ; Eurostat : réutilisation autorisée avec mention de la source (CC BY 4.0).</p>
+  <p>Calculs rejouables : <code>calculer_chiffres_comparaisons.py</code> (comparaisons), <code>nettoyer_sante.py</code>, <code>calculer_chiffres_sante.py</code> puis <code>generer_rapport_sante.py</code> ; chiffres vérifiés de façon indépendante à partir des fichiers bruts.</p>
 </section>"""
 
 
 eua_u = eua["Établissements avec urgences autorisées"]
 casse = casse_en_chiffres("La casse en chiffres", [
-    f"<strong>{n(abs(L['lits']['ecart']))} lits d'hospitalisation complète en moins</strong> entre {L['periode'][0]} et {L['periode'][1]} ({pct(L['lits']['pct'])}).",
+    f"<strong>{n(abs(L['lits']['ecart']))} lits d'hospitalisation complète en moins</strong> entre {L['periode'][0]} et {L['periode'][1]} ({pct(L['lits']['pct'])}) ; {d(CP['sante']['lits_pour_1000']['fin'], 2)} lits pour 1 000 habitants contre {d(CP['sante']['lits_pour_1000']['debut'], 2)} ({pct(CP['sante']['lits_pour_1000']['pct'])}), et {pct(CP['sante']['lits_pour_1000_plus_75']['pct'])} pour 1 000 personnes de 75 ans ou plus ; les places d'hospitalisation partielle progressent de {pct(L['places']['pct'], False)}.",
     f"<strong>{abs(MA['total']['ecart'])} maternités en moins</strong> ({n(MA['total']['debut'])} en {MA['periode'][0]}, {n(MA['total']['fin'])} en {MA['periode'][1]}) ; les lits d'obstétrique reculent de {pct(abs(MA['lits_obstetrique']['pct']), False)}.",
     f"<strong>Un lit de chirurgie sur quatre</strong> a disparu entre {pa0} et {pa1} ({pct(em['Chirurgie']['pct'])}) ; la psychiatrie perd {n(abs(ps_l['evol']['Total']['ecart']))} lits à temps plein.",
     f"<strong>{abs(eua_u['ecart'])} établissements de moins</strong> avec un service d'urgences autorisé ({pa0}-{pa1}).",
     f"<strong>{d(apl_fin['population_sous_dense'] / 1e6)} millions d'habitants</strong> ({pct(apl_fin['part'], False)}) vivent en commune sous-dotée en généralistes en {apl_fin['annee']}, contre {d(apl_debut['population_sous_dense'] / 1e6)} millions ({pct(apl_debut['part'], False)}) en {apl_debut['annee']} (hausse due en partie à l'évolution de la population).",
-], note=f"« Casse » : notre lecture de ces évolutions. Elles ne disent pas tout : les places d'hospitalisation partielle progressent ({pct(L['places']['pct'])}), l'hospitalisation à domicile aussi, et le public assure une part croissante des maternités. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
+], note="« Casse » : notre lecture de ces évolutions. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
 
 tuiles = f"""
   <div class="tiles">
@@ -534,22 +537,53 @@ s_carte = section_carte("La carte", "L'accès aux soins, département par dépar
   <p class="limite"><strong>Limites :</strong> classes de couleur = cinquièmes des départements ; un taux par département mesure où sont les équipements et les médecins, pas l'accès réel des habitants. Mêmes sources et mêmes réserves que les sections correspondantes.</p>""")
 
 
+# --- Comparaisons : population (Insee), Europe (Eurostat), OCDE ----------------------------------------
+CS = CP["sante"]
+cl0, cl1 = CS["periode_lits"]
+g_hab = barres_divergentes([("Lits d'hospitalisation complète", L["lits"]["pct"]), ("Population", CS["population"]["pct"]),
+                            ("Personnes de 75 ans ou plus", CS["plus_75_ans"]["pct"])],
+                           lambda v: ("+" if v > 0 else "−") + d(abs(v)) + "&nbsp;%", f"Évolution {cl0}-{cl1}")
+s_hab = section("0", "Rapporté à la population", f"{d(CS['lits_pour_1000']['fin'], 2)} lits pour 1 000 habitants, contre {d(CS['lits_pour_1000']['debut'], 2)} en {cl0}", g_hab, f"""
+  <p class="take">Pendant que les lits d'hospitalisation complète reculent ({pct(L['lits']['pct'])}), la population augmente ({pct(CS['population']['pct'])}) et celle des 75 ans ou plus bien davantage ({pct(CS['plus_75_ans']['pct'])}). Rapporté à la population, le nombre de lits passe de {d(CS['lits_pour_1000']['debut'], 2)} à <strong>{d(CS['lits_pour_1000']['fin'], 2)} pour 1 000 habitants</strong> ({pct(CS['lits_pour_1000']['pct'])}).</p>
+  <p>Pour 1 000 personnes de 75 ans ou plus, il passe de {d(CS['lits_pour_1000_plus_75']['debut'])} à <strong>{d(CS['lits_pour_1000_plus_75']['fin'])}</strong> ({pct(CS['lits_pour_1000_plus_75']['pct'])}).</p>
+  {lecture("l'hôpital perd des lits au moment même où la population vieillit.")}
+  {limite(f"lits au 31 décembre rapportés à la population au 1er janvier suivant (Insee, estimations ; 2025 provisoire) ; tous les patients hospitalisés n'ont pas 75 ans ou plus, le rapport aux 75 ans ou plus illustre l'écart entre l'offre et le vieillissement.")}""")
+
+EL = CS["europe_lits"]
+an_eu = [x["annee"] for x in EL["serie_france"]]
+ue = {x["annee"]: x["valeur"] for x in EL["serie_ue"]}
+g_eu = courbes([("France", "var(--alerte)", [x["valeur"] for x in EL["serie_france"]]),
+                ("Union européenne (27)", "var(--dim)", [ue.get(a) for a in an_eu])],
+               an_eu, 400, 900, 100, lambda v: n(v), "Lits d'hôpital pour 100 000 habitants (Eurostat)")
+fr_eu, de_eu = EL["pays"]["France"], EL["pays"]["Allemagne"]
+s_eu = section("0", "En Europe", f"Selon Eurostat, le nombre de lits d'hôpital pour 100 000 habitants a baissé d'un tiers en France depuis {EL['annee_debut']} ({pct(100 * (fr_eu['fin'] - fr_eu['debut']) / fr_eu['debut'])})", g_eu, f"""
+  <p class="take">Selon Eurostat, la France comptait <strong>{n(fr_eu['debut'])}</strong> lits d'hôpital pour 100 000 habitants en {EL['annee_debut']}, et <strong>{n(fr_eu['fin'])}</strong> en {EL['annee_fin']}. L'Allemagne en compte {n(de_eu['fin'])}.</p>
+  <p>La France se rapproche ainsi de la moyenne de l'Union européenne ({n(EL['pays']['Union européenne (27)']['fin'])} en {EL['annee_fin']}).</p>
+  {limite(f"Eurostat signale une rupture de série en 2013 : sur {2013}-{EL['annee_fin']}, la baisse est de {pct(100 * (fr_eu['fin'] - CS['europe_lits_france_2013']) / CS['europe_lits_france_2013'])} ({n(CS['europe_lits_france_2013'])} → {n(fr_eu['fin'])}). Moyenne de l'Union européenne disponible à partir de 2009. Définition européenne des lits d'hôpital (tous types de soins), différente de la statistique française utilisée dans le reste du rapport : les deux sources ne se comparent pas entre elles.")}""",
+               legende([("France", "var(--alerte)"), ("Union européenne (27)", "var(--dim)")]))
+
+OG = CS["ocde_generalistes"]
+g_og = courbes([("France", "var(--alerte)", [x["valeur"] for x in OG["serie"]])], [x["annee"] for x in OG["serie"]], 1.2, 1.7, 0.1,
+               lambda v: d(v, 2), "Médecins généralistes pour 1 000 habitants, France (OCDE)", mention="Axe tronqué")
+s_og = section("0", "Sur vingt ans", f"{d(OG['fin'], 2)} généraliste pour 1 000 habitants en {OG['annees'][1]}, contre {d(OG['debut'], 2)} en {OG['annees'][0]}", g_og, f"""
+  <p class="take">D'après l'OCDE, la France compte <strong>{d(OG['fin'], 2)}</strong> médecin généraliste pour 1 000 habitants en {OG['annees'][1]}, contre {d(OG['debut'], 2)} en {OG['annees'][0]} ({pct(OG['pct'])}).</p>
+  {limite("OCDE, statistiques de la santé, médecins généralistes déclarés par la France ; définition différente de celle du répertoire RPPS utilisé dans la section précédente.")}""")
+
+
 def partie(ident, titre, intro):
     return f'<div class="partie" id="{ident}"><div class="eyebrow">{titre}</div><p class="lead">{intro}</p></div>'
 
 PARTIES = [
-    ("hopital", "L'hôpital", "Établissements, lits, psychiatrie, réanimation et soins critiques.", [s_etab, s1, s_mco, s_psy, s_had, s5, s_unites, s_rea_dep]),
-    ("soignants", "Les soignants", "Qui travaille à l'hôpital, et où.", [s4, s_metiers, s_part]),
+    ("hopital", "L'hôpital", "Établissements, lits, chirurgie, psychiatrie.", [s_etab, s1, s_hab, s_eu, s_mco, s_psy, s_rea_dep]),
     ("naissance", "Naître", "Les maternités, leur nombre, leur type, leur répartition.", [s2, s_types, s_taille, s_mat_dep]),
-    ("medecins", "Les médecins", "Combien de médecins, où, et à quel âge.", [s_gen, s_age, s_ex, s_dens, s_spe]),
+    ("medecins", "Les médecins", "Combien de médecins, où, et à quel âge.", [s_gen, s_age, s_dens, s_spe]),
     ("generalistes", "L'accès au généraliste", "L'accès aux soins de ville, commune par commune.", [s3, s_classes, s_apl_dep, s_apl_hausse]),
-    ("urgences", "Les urgences", "Les services d'urgences et leur fréquentation.", [s_urg_aut, s6, s_saison, s_urg_dep]),
-    ("financement", "Qui paie ?", "Le financement des soins et la dépense hospitalière.", [s_fin, s_hop]),
+    ("urgences", "Les urgences", "Les services d'urgences.", [s_urg_aut]),
 ]
 sommaire = ('<nav class="sommaire" aria-label="Sommaire">'
             + "".join(f'<a href="#{i}">{t}</a>' for i, t, _, _ in PARTIES)
             + '<a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav>')
-corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + s_carte + tableau + fiab.replace("<section>", '<section id="fiabilite">', 1)
+corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + tableau + fiab.replace("<section>", '<section id="fiabilite">', 1)
 corps = re.sub(r"<p><em>Notre lecture :</em> (.*?)</p>", lambda mt: lecture(mt.group(1)[0].lower() + mt.group(1)[1:]), corps)  # encadrés d'interprétation
 corps = re.sub(r" <em>Notre lecture :</em> (.*?)</p>", lambda mt: "</p>" + lecture(mt.group(1)[0].lower() + mt.group(1)[1:]), corps)  # lectures en fin de paragraphe
 corps = corps.replace("<p><strong>Limite", '<p class="limite"><strong>Limite')  # limites plus discrètes, toujours présentes
@@ -558,6 +592,8 @@ corps = corps.replace("<p><strong>Limite", '<p class="limite"><strong>Limite')  
 compteur = iter(range(1, 100))
 corps = re.sub(r"<h3>\d+ · ", lambda _: f"<h3>{next(compteur)} · ", corps)
 corps = alleger_limites(corps)  # version presse : limites repliables, jamais supprimées
+carte_haut = alleger_limites(re.sub(r"<h3>0 · ", "<h3>", s_carte))  # carte en tête de page, juste après l'en-tête
+entete = entete.replace("</header>", "</header>" + carte_haut, 1)
 
 STYLE_SUPPL = """<style>
 /* Couleurs supplémentaires (séries multiples), sommaire, parties, recherche */

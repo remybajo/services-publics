@@ -12,12 +12,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # modules du projet
 from graphiques_svg import (STYLE_MILITANT, barres_groupees, barres_h, casse_en_chiffres, courbes, d, lecture,  # noqa: E402
                             legende, limite, n, pct, section)
-from graphiques_svg import alleger_limites  # noqa: E402
+from graphiques_svg import alleger_limites, barres_divergentes  # noqa: E402
+CP = json.load(open("donnees_propres/comparaisons/chiffres_comparaisons.json", encoding="utf-8"))  # comparaisons : population, Europe, OCDE
 from cartes_svg import STYLE_CARTE, carte_departements, section_carte  # noqa: E402
 
 FICHE = "donnees_propres/education/chiffres_education.json"
 MODELE_STYLE = "rapport_lots.html"
-SORTIE = "rapport_education.html"
+SORTIE = "rapports/rapport_education.html"
 BROUILLON = "--brouillon" in sys.argv
 
 C = json.load(open(FICHE, encoding="utf-8"))
@@ -181,7 +182,7 @@ casse = casse_en_chiffres("La casse en chiffres", [
     f"Collégiens d'origine très favorisée : <strong>{d(ss[-1]['p_tfav_pr'])}&nbsp;%</strong> des collégiens du privé en {ss[-1]['annee']} ({d(ss[0]['p_tfav_pr'])}&nbsp;% en {ss[0]['annee']}), {d(ss[-1]['p_tfav_pu'])}&nbsp;% de ceux du public.",
     f"Indice de position sociale des collèges : <strong>{d(IP['national_prive'])}</strong> dans le privé, {d(IP['national_public'])} dans le public ({IP['rentree']}).",
     f"Supérieur : <strong>{pct(ho['prive']['pct'])}</strong> d'étudiants dans le privé entre {ho['debut']} et {ho['fin']}, contre {pct(ho['public']['pct'])} dans le public ; le privé accueille {d(ho['part_prive_fin'])}&nbsp;% des étudiants.",
-], note=f"« Casse » : notre lecture de ces évolutions. Elles ne disent pas tout : le public compte {pct(EC['eleves_public']['pct'], False)} d'élèves en moins dans le premier degré, ses classes sont plus nombreuses ({pct(EC['classes_public']['pct'])}) et moins chargées ({d(se[0]['eleves_par_classe_public'])} → {d(se[-1]['eleves_par_classe_public'])} élèves), et la part du privé dans le supérieur recule légèrement depuis {SU['pic_part_prive']['annee']}. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
+], note=f"« Casse » : notre lecture de ces évolutions. Dans le premier degré public, les élèves sont moins nombreux ({pct(EC['eleves_public']['pct'])}), les classes plus nombreuses ({pct(EC['classes_public']['pct'])}) et moins chargées ({d(se[0]['eleves_par_classe_public'])} → {d(se[-1]['eleves_par_classe_public'])} élèves) ; rapporté aux enfants de moins de 10 ans ({pct(CP['education']['enfants_moins_10']['pct'])}, hors Mayotte), le recul des écoles publiques est de {pct(CP['education']['ecoles_pour_10000_enfants']['pct'], False)}. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
 
 fiab = f"""
 <section id="fiabilite">
@@ -195,6 +196,7 @@ fiab = f"""
     <tr><td>IPS des collèges</td><td>Nouvelle série depuis 2023-2024</td><td>Pas de comparaison avec l'IPS d'avant 2022</td></tr>
     <tr><td>Supérieur (SIES)</td><td>Deux changements de comptage en {ho['debut']} ; privé lucratif non isolable ; écoles paramédicales provisoires en {ho['fin']}</td><td>Comparaison principale de {ho['debut']} à {ho['fin']} ; série longue hors apprentis</td></tr>
     <tr><td>Absent des données ouvertes</td><td>Financement public du privé, dépense par élève, postes d'enseignants et contractuels, accompagnants d'élèves handicapés, médecine scolaire</td><td>Non traités dans ce rapport</td></tr>
+      <tr><td>Comparaisons (Insee, OCDE, Eurostat)</td><td>Population 2024-2025 provisoire ; enfants de moins de 10 ans, tranche plus large que l'âge du primaire ; salaires statutaires hors primes ; définition différente pour la France selon Eurostat (élèves par enseignant)</td><td>Ordres de grandeur et tendances ; ratios par enfant hors Mayotte</td></tr>
   </table></div>
 </section>"""
 date = open("donnees_brutes/education/date_telechargement.txt", encoding="utf-8").read().strip()
@@ -202,7 +204,8 @@ sources = f"""
 <section>
   <h3>Sources</h3>
   <p>Direction de l'évaluation, de la prospective et de la performance (DEPP, ministère chargé de l'éducation nationale, data.education.gouv.fr, Licence Ouverte v2.0) : effectifs d'élèves et nombre de classes par école (rentrées 2009 à 2025) ; indicateur de ségrégation sociale entre collèges publics et privés (2014 à 2025) ; indice de position sociale des collèges (depuis 2023-2024). Sous-direction des systèmes d'information et des études statistiques (SIES, ministère chargé de l'enseignement supérieur, data.enseignementsup-recherche.gouv.fr, Licence Ouverte v2.0) : effectifs d'étudiants inscrits, version agrégeable (2001-2002 à 2025-2026). Téléchargement du {date}.</p>
-  <p>Calculs rejouables : <code>nettoyer_education.py</code>, <code>calculer_chiffres_education.py</code> puis <code>generer_rapport_education.py</code>.</p>
+  <p>Population : Insee, estimations localisées de population au 1er janvier (Licence Ouverte). Comparaisons : OCDE, Regards sur l'éducation (salaires statutaires des enseignants), OCDE : licence CC BY 4.0 ; Eurostat, élèves par enseignant (educ_uoe_perp04), Eurostat : réutilisation autorisée avec mention de la source (CC BY 4.0).</p>
+  <p>Calculs rejouables : <code>calculer_chiffres_comparaisons.py</code> (comparaisons), <code>nettoyer_education.py</code>, <code>calculer_chiffres_education.py</code> puis <code>generer_rapport_education.py</code>.</p>
 </section>"""
 bandeau = ('<div class="take" style="border-color:var(--warn)"><strong>Brouillon en cours de vérification</strong> : '
            'chiffres non encore validés de façon indépendante, ne pas diffuser.</div>') if BROUILLON else ""
@@ -246,21 +249,58 @@ s_carte = section_carte("La carte", "L'école, le collège et le supérieur, dé
   <p class="limite"><strong>Limites :</strong> classes de couleur = cinquièmes des départements ; écoles : une école en moins peut être une fermeture, une fusion ou un changement de numéro ; collège : pas de valeur pour les départements sans collège privé ; supérieur : département de la commune d'inscription, et non du domicile des étudiants.</p>""")
 
 
+# --- Comparaisons : population (Insee), Europe (Eurostat), OCDE ----------------------------------------
+CE = CP["education"]
+hab = sorted([kv for kv in CE["par_departement"].items() if kv[1]["pct"] < 0], key=lambda kv: kv[1]["pct"])[:15]
+g_hab = barres_h([(nom(k, o["nom"]), -o["pct"]) for k, o in hab], lambda v: "−" + d(v) + "&nbsp;%",
+                 f"Baisse du nombre d'écoles publiques pour 10 000 enfants de moins de 10 ans, {CE['periode'][0]}-{CE['periode'][1]}", couleur="var(--alerte)", vmax=50)
+s_hab = section("0", "Rapporté aux enfants", f"Moins d'écoles publiques par enfant dans {CE['deps_ratio_en_baisse']} départements sur {len(CE['par_departement'])}", g_hab, f"""
+  <p class="take">Les enfants de moins de 10 ans sont moins nombreux ({pct(CE['enfants_moins_10']['pct'])} entre {CE['periode'][0]} et {CE['periode'][1]}), mais les écoles publiques reculent plus vite : on passe de {d(CE['ecoles_pour_10000_enfants']['debut'])} à <strong>{d(CE['ecoles_pour_10000_enfants']['fin'])} écoles publiques pour 10 000 enfants</strong> ({pct(CE['ecoles_pour_10000_enfants']['pct'])}).</p>
+  <p>Le recul par enfant touche <strong>{CE['deps_ratio_en_baisse']} départements sur {len(CE['par_departement'])}</strong>. Les plus fortes baisses : {nom(hab[0][0], hab[0][1]['nom'])} ({pct(hab[0][1]['pct'])}), {nom(hab[1][0], hab[1][1]['nom'])} ({pct(hab[1][1]['pct'])}), {nom(hab[2][0], hab[2][1]['nom'])} ({pct(hab[2][1]['pct'])}).</p>
+  {limite("écoles publiques à la rentrée rapportées aux enfants de moins de 10 ans au 1er janvier (Insee, estimations), tranche plus large que l'âge du primaire ; une école en moins peut être une fusion ; Mayotte exclue aux deux dates (pas d'estimation par âge en 2009).")}""")
+
+SAL = CE["ocde_salaires_primaire"]
+an_s = [a for a in sorted(SAL["FRA"]) if a >= "2005"]
+g_sal = courbes([("France", "var(--alerte)", [SAL["FRA"].get(a) for a in an_s]),
+                 ("Moyenne OCDE", "var(--dim)", [SAL["OECD"].get(a) for a in an_s]),
+                 ("Allemagne", "var(--s1)", [SAL["DEU"].get(a) for a in an_s])],
+                an_s, 80, 115, 5, lambda v: d(v, 0), "Salaire statutaire des enseignants du primaire après 15 ans de carrière, hors inflation (indice 100 en 2015, OCDE)",
+                mention="Indice, base 100 en 2015 (axe tronqué)")
+fr_s, oc_s = SAL["FRA"], SAL["OECD"]
+s_sal = section("0", "Salaires des enseignants", f"Hors inflation, le salaire statutaire d'un professeur des écoles après 15 ans de carrière est {pct(100 * (fr_s[an_s[-1]] - fr_s['2000']) / fr_s['2000'], False)} plus bas qu'en 2000", g_sal, f"""
+  <p class="take">Selon l'OCDE, une fois l'inflation déduite, le salaire statutaire d'un enseignant du primaire public après 15 ans de carrière est en {an_s[-1]} à l'indice <strong>{d(fr_s[an_s[-1]], 1)}</strong> (base 100 en 2015), contre {d(fr_s['2000'], 1)} en 2000 : il a reculé.</p>
+  <p>Sur la même période, la moyenne des pays de l'OCDE passe de {d(oc_s[an_s[0]], 1)} en {an_s[0]} à {d(oc_s[an_s[-1]], 1)} en {an_s[-1]}.</p>
+  {lecture(f"le métier d'enseignant s'est appauvri en France, alors que ce salaire a augmenté dans {len(CE['ocde_salaires_hausse_2000_2025'])} des {len(CE['ocde_salaires_hausse_2000_2025']) + len(CE['ocde_salaires_baisse_2000_2025'])} systèmes éducatifs de l'OCDE disposant de données en 2000 et en {an_s[-1]}.")}
+  {limite("OCDE, Regards sur l'éducation : indice publié par l'OCDE, corrigé de l'inflation (en euros courants, ce salaire augmente), salaire statutaire hors primes ; courbe de la moyenne OCDE à partir de 2005, avec des pays qui changent d'une année à l'autre.")}""",
+                legende([("France", "var(--alerte)"), ("Moyenne OCDE", "var(--dim)"), ("Allemagne", "var(--s1)")]))
+
+EE, ED = CE["europe_eleves_par_enseignant_primaire"], CE["europe_depense_education_pib"]
+pays = [(lib, v["fin"]) for lib, v in EE["pays"].items() if v["fin"] is not None]
+g_ee = barres_h(sorted(pays, key=lambda x: -x[1]), lambda v: d(v, 1), f"Élèves par enseignant dans le primaire, {EE['annee_fin']} (Eurostat)",
+                couleur=lambda i, v: "var(--alerte)" if v == EE["pays"]["France"]["fin"] else "var(--dim)")
+s_ee = section("0", "En Europe", f"{d(EE['pays']['France']['fin'], 1)} élèves par enseignant en primaire : la France au 2ᵉ rang le plus élevé de l'Union, ex æquo avec la Tchéquie" if CE['eleves_ex_aequo_france'] == ['CZ'] and len(CE['eleves_pays_au_dessus']) == 1 else f"{d(EE['pays']['France']['fin'], 1)} élèves par enseignant en primaire", g_ee, f"""
+  <p class="take">En {EE['annee_fin']}, la France compte <strong>{d(EE['pays']['France']['fin'], 1)} élèves par enseignant</strong> dans le primaire ({d(EE['pays']['France']['debut'], 1)} en {EE['annee_debut']}), contre {d(EE['pays']['Union européenne (27)']['fin'], 1)} en moyenne dans l'Union européenne. Seule la Roumanie en compte davantage ; la Tchéquie en compte autant.</p>
+  {limite("Eurostat : élèves par enseignant (CITE 1, enseignement primaire), tous secteurs ; Eurostat signale une définition différente pour la France. Un ratio élèves par enseignant n'est pas une taille de classe.")}""")
+
+
 def partie(ident, titre, intro):
     return f'<div class="partie" id="{ident}"><div class="eyebrow">{titre}</div><p class="lead">{intro}</p></div>'
 
 
 PARTIES = [
-    ("ecole", "L'école primaire", "Écoles, élèves et classes, public et privé sous contrat.", [s_ec, s_pet, s_cl, s_dep]),
+    ("ecole", "L'école primaire", "Écoles, élèves et classes, public et privé sous contrat.", [s_ec, s_hab, s_pet, s_dep]),
+    ("moyens", "Les moyens", "Enseignants, salaires et dépense publique, comparés à l'Europe et à l'OCDE.", [s_sal, s_ee]),
     ("college", "Le collège", "Qui va dans le public, qui va dans le privé.", [s_seg, s_ips]),
     ("superieur", "L'enseignement supérieur", "La place croissante des établissements privés.", [s_sup, s_reg]),
 ]
 sommaire = ('<nav class="sommaire" aria-label="Sommaire">' + "".join(f'<a href="#{i}">{t}</a>' for i, t, _, _ in PARTIES)
             + '<a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav>')
-corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + s_carte + tableau + fiab
+corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + tableau + fiab
 compteur = iter(range(1, 100))
 corps = re.sub(r"<h3>\d+ · ", lambda _: f"<h3>{next(compteur)} · ", corps)
 corps = alleger_limites(corps)  # version presse : limites repliables, jamais supprimées
+carte_haut = alleger_limites(re.sub(r"<h3>0 · ", "<h3>", s_carte))  # carte en tête de page, juste après l'en-tête
+entete = entete.replace("</header>", "</header>" + carte_haut, 1)
 
 STYLE_SUPPL = """<style>
 :root { --s3: #1f9e89; --s4: #8a5cd6; --s5: #c99a06; --s6: #c2417a; }

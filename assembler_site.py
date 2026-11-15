@@ -10,12 +10,12 @@ import re
 SORTIE = "site_services_publics"
 # Ordre du menu : (fichier publié, rapport source, libellé du menu)
 PAGES = [
-    ("sante.html", "rapport_sante.html", "Santé"),
-    ("transports.html", "rapport_transports.html", "Transports"),
-    ("poste.html", "rapport_poste.html", "La Poste"),
-    ("logement.html", "rapport_logement.html", "Logement"),
-    ("education.html", "rapport_education.html", "Éducation"),
-    ("territoires.html", "rapport_territoires.html", "Territoires"),
+    ("sante.html", "rapports/rapport_sante.html", "Santé"),
+    ("transports.html", "rapports/rapport_transports.html", "Transports"),
+    ("poste.html", "rapports/rapport_poste.html", "La Poste"),
+    ("logement.html", "rapports/rapport_logement.html", "Logement"),
+    ("education.html", "rapports/rapport_education.html", "Éducation"),
+    ("territoires.html", "rapports/rapport_territoires.html", "Territoires"),
 ]
 STYLE_MENU = """<style>
 .menu-site { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 10px 0 14px; border-bottom: 1px solid var(--ring); margin-bottom: 8px; }

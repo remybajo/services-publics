@@ -17,7 +17,7 @@ from cartes_svg import STYLE_CARTE, carte_departements, section_carte  # noqa: E
 
 FICHE = "donnees_propres/transports/chiffres_transports.json"
 MODELE_STYLE = "rapport_lots.html"
-SORTIE = "rapport_transports.html"
+SORTIE = "rapports/rapport_transports.html"
 BROUILLON = "--brouillon" in sys.argv
 
 C = json.load(open(FICHE, encoding="utf-8"))
@@ -341,19 +341,20 @@ def partie(ident, titre, intro):
 
 PARTIES = [
     ("lignes", "Les lignes", "Le réseau ferré national, année par année.", [s_rfn, s_rreg, s_res]),
-    ("train-regional", "Le train régional", "Fréquentation, offre, suppressions et financement des TER.", [s_freq, s_ter, s_annul, s_reg, s_fin]),
-    ("grandes-lignes", "Les grandes lignes", "Intercités et TGV.", [s_ic, s_tgv]),
+    ("train-regional", "Le train régional", "Fréquentation, offre et suppressions des TER.", [s_freq, s_ter, s_annul, s_reg]),
+    ("grandes-lignes", "Les grandes lignes", "La régularité des TGV.", [s_tgv]),
     ("cheminots", "Les cheminots", "Statut et contrats à la SNCF.", [s_eff]),
-    ("gares", "Gares et réseau", "Guichets, arrêts de trains, fréquentation des gares, statut des lignes.", [s_des, s_gui, s_gdep, s_gar]),
-    ("route-ville", "Cars et transports urbains", "Les autres transports collectifs.", [s_au, s_ur]),
+    ("gares", "Gares et réseau", "Guichets, arrêts de trains, statut des lignes.", [s_des, s_gui, s_gdep]),
 ]
 sommaire = ('<nav class="sommaire" aria-label="Sommaire">' + "".join(f'<a href="#{i}">{t}</a>' for i, t, _, _ in PARTIES)
             + '<a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav>')
-corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + s_carte + tableau + fiab
+corps = "".join(partie(i, t, intro) + "".join(secs) for i, t, intro, secs in PARTIES) + tableau + fiab
 corps = corps.replace("<p><strong>Limite", '<p class="limite"><strong>Limite')  # limites plus discrètes, toujours présentes
 compteur = iter(range(1, 100))
 corps = re.sub(r"<h3>\d+ · ", lambda _: f"<h3>{next(compteur)} · ", corps)
 corps = alleger_limites(corps)  # version presse : limites repliables, jamais supprimées
+carte_haut = alleger_limites(re.sub(r"<h3>0 · ", "<h3>", s_carte))  # carte en tête de page, juste après l'en-tête
+entete = entete.replace("</header>", "</header>" + carte_haut, 1)
 
 STYLE_SUPPL = """<style>
 :root { --s3: #1f9e89; --s4: #8a5cd6; --s5: #c99a06; --s6: #c2417a; }
