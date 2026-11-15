@@ -92,10 +92,6 @@ def main():
 <section>
   <div class="cartes">""" + "".join(cartes) + """</div>
 </section>
-<section>
-  <h3>Méthode</h3>
-  <p>Chaque rapport suit la même chaîne : téléchargement des données publiques, nettoyage par script sans correction à la main, puis calcul de chaque chiffre par script à partir de la source brute. Les encadrés « Notre lecture » signalent les interprétations ; les limites des données figurent à côté des chiffres et dans la section « Fiabilité » de chaque rapport.</p>
-</section>
 """ + K.pied() + """
 </div>
 </body>
