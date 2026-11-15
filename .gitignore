@@ -1,0 +1,13 @@
+# Données : retéléchargeables depuis leurs sources (voir README), trop lourdes pour GitHub
+donnees_brutes/*
+!donnees_brutes/cartes/
+donnees_propres/
+*.csv
+
+# Copies anciennes et fichiers techniques
+dossier Cloudflare/
+site_sante/
+/index.html
+__pycache__/
+.DS_Store
+.claude/launch.json

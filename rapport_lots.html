@@ -1,0 +1,354 @@
+<title>Lots Pôle Emploi en graphiques</title>
+<style>
+/* Mise en page : rapport en une colonne de lecture, chaque section = un graphique + son explication à côté (empilés sur mobile) */
+:root {
+  --bg: #f6f7f9;
+  --surface: #fcfcfb;
+  --ink: #0f1720;
+  --ink-2: #4a5260;
+  --muted: #858b94;
+  --grid: #e1e3e8;
+  --axis: #c3c6cd;
+  --ring: rgba(15,23,32,.10);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --dim: #b9bec7;
+  --accent-wash: #e8f0fb;
+  --warn: #d03b3b;
+  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --surface: #1a1b1e; --ink: #f4f5f7; --ink-2: #c3c6cd; --muted: #8b9099;
+    --grid: #2c2e33; --axis: #3a3d43; --ring: rgba(255,255,255,.10);
+    --s1: #3987e5; --s2: #d95926; --dim: #4b4f57; --accent-wash: #1b2a3d; --warn: #e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --surface: #1a1b1e; --ink: #f4f5f7; --ink-2: #c3c6cd; --muted: #8b9099;
+  --grid: #2c2e33; --axis: #3a3d43; --ring: rgba(255,255,255,.10);
+  --s1: #3987e5; --s2: #d95926; --dim: #4b4f57; --accent-wash: #1b2a3d; --warn: #e66767;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 48px 72px; display: grid; gap: 56px; }
+header { display: grid; gap: 14px; max-width: 760px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--s1); }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1; font-weight: 800; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+h2 { font-size: 24px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+h3 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.lead { font-size: 18px; color: var(--ink-2); }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 18px; display: grid; gap: 4px; }
+.tile .v { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+.tile .l { font-size: 14px; color: var(--ink-2); }
+section { display: grid; gap: 18px; }
+.row { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.chart { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 18px 18px 10px; min-width: 0; display: grid; gap: 10px; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart svg text { font-family: var(--font); }
+.note { display: grid; gap: 12px; min-width: 0; }
+.note p { color: var(--ink-2); }
+.note strong { color: var(--ink); }
+.take { border-left: 3px solid var(--s1); padding: 4px 0 4px 14px; color: var(--ink); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--accent-wash); color: var(--ink); white-space: nowrap; }
+.pill.w { background: color-mix(in srgb, var(--warn) 16%, transparent); }
+.trap { display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 20px; }
+.lines { display: grid; gap: 6px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.lines div { display: grid; grid-template-columns: 9ch 1fr; gap: 10px; align-items: center; }
+.lines b { display: block; height: 22px; border-radius: 0 4px 4px 0; }
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.4; padding: 8px 10px; border-radius: 6px; max-width: 280px; opacity: 0; transition: opacity .1s; }
+#tip b { font-weight: 600; }
+footer { font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
+@media (max-width: 820px) {
+  .row { grid-template-columns: minmax(0,1fr); gap: 18px; }
+  .tiles { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { #tip { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Analyse de l'export « lots » · marchés publics 2011–2025</div>
+    <h1>Qui achète quoi chez Pôle Emploi, et à qui ?</h1>
+    <p class="lead">Ce fichier recense les lots de marchés publics que Pôle Emploi (devenu France Travail en 2024) a attribués à des prestataires externes : formations, accompagnement des demandeurs d'emploi, informatique, etc. Voici ce qu'il dit, graphique par graphique.</p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><div class="v">3,51 Md€</div><div class="l">montant total des lots (chaque lot compté une fois)</div></div>
+    <div class="tile"><div class="v">739</div><div class="l">lots attribués</div></div>
+    <div class="tile"><div class="v">193</div><div class="l">marchés publiés au BOAMP</div></div>
+    <div class="tile"><div class="v">634</div><div class="l">prestataires différents</div></div>
+  </div>
+
+  <!-- 1. Lecture du fichier -->
+  <section>
+    <h3>1 · Comment lire le fichier</h3>
+    <h2>Une ligne n'est pas un lot</h2>
+    <div class="row">
+      <div class="chart">
+        <svg id="c-attr" role="img" aria-label="Nombre de lots selon leur nombre d'attributaires"></svg>
+      </div>
+      <div class="note">
+        <p>Un <strong>marché</strong> est découpé en <strong>lots</strong> (souvent un par territoire ou par métier). Chaque lot peut être attribué à <strong>plusieurs prestataires</strong> : c'est le principe de l'accord-cadre multi-attributaires.</p>
+        <p>Le fichier contient une ligne par couple lot × prestataire. Seuls 282 lots sur 739 ont un prestataire unique ; un lot national en compte même 41.</p>
+        <p class="take">Le montant du lot est recopié sur chaque ligne. Il ne faut jamais additionner la colonne telle quelle.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <p><strong>Ce que donne l'addition naïve</strong></p>
+      <div class="lines">
+        <div><span>12,03 Md€</span><b style="width:100%;background:var(--dim)"></b></div>
+        <div><span>3,51 Md€</span><b style="width:29.2%;background:var(--s1)"></b></div>
+      </div>
+      <p style="color:var(--ink-2);font-size:14px">En gris, la somme des 2 061 lignes. En bleu, la somme réelle des 739 lots. L'erreur multiplierait le total par 3,4.</p>
+    </div>
+  </section>
+
+  <!-- 2. Années -->
+  <section>
+    <h3>2 · Dans le temps</h3>
+    <h2>2024 concentre un tiers des montants</h2>
+    <div class="row">
+      <div class="chart">
+        <svg id="c-annee" role="img" aria-label="Montant des lots par année d'attribution"></svg>
+      </div>
+      <div class="note">
+        <p>Montant des lots selon l'année d'attribution. Presque tout se joue entre 2021 et 2025 ; avant, le fichier ne contient que 18 lots.</p>
+        <p>En <strong>2024</strong>, 305 lots ont été attribués pour <strong>1,21 Md€</strong>. Ce pic vient surtout de quelques très gros marchés régionaux de <strong>formation</strong> (PACA, Grand Est, Auvergne-Rhône-Alpes), découpés par métier et par département.</p>
+        <p>2025 est porté par un seul marché informatique de 495 M€ (« SI Cœur de métiers »).</p>
+        <p class="take">La hausse ne traduit pas forcément plus d'achats : le fichier semble surtout plus complet sur les années récentes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Catégories -->
+  <section>
+    <h3>3 · Ce qui est acheté</h3>
+    <h2>La formation domine, l'informatique coûte cher par lot</h2>
+    <div class="row">
+      <div class="chart">
+        <svg id="c-cat" role="img" aria-label="Montant des lots par catégorie"></svg>
+      </div>
+      <div class="note">
+        <p><strong>La formation</strong> pèse 1,1 Md€, soit près d'un tiers du total, réparti sur 253 lots.</p>
+        <p><strong>La sécurité numérique</strong> (en réalité l'ensemble des marchés informatiques) arrive deuxième avec seulement 22 lots : <strong>27,7 M€ en moyenne par lot</strong>, contre 3,3 M€ pour l'insertion.</p>
+        <p><strong>« Échanges avec Pôle Emploi »</strong> recouvre la relation usagers externalisée : centres d'appels, numérisation des courriers, appui à distance.</p>
+        <p class="take">Formation, accompagnement et insertion forment le cœur métier : 60 % des montants et 3 lots sur 4.</p>
+      </div>
+    </div>
+    <div class="chart">
+      <svg id="c-moy" role="img" aria-label="Montant moyen par lot selon la catégorie"></svg>
+    </div>
+  </section>
+
+  <!-- 4. Acheteurs -->
+  <section>
+    <h3>4 · Qui achète</h3>
+    <h2>Le siège pour l'informatique, les régions pour les prestations</h2>
+    <div class="row">
+      <div class="chart">
+        <div class="legend"><span><i style="background:var(--s2)"></i>Directions nationales</span><span><i style="background:var(--s1)"></i>Directions régionales</span><span><i style="background:var(--dim)"></i>Non renseigné ou regroupé</span></div>
+        <svg id="c-ach" role="img" aria-label="Montant des lots par acheteur"></svg>
+      </div>
+      <div class="note">
+        <p>Le premier acheteur est la <strong>DGA Systèmes d'information</strong> (Montreuil) : 817 M€ en 35 lots. Avec la DSI de Castelnau, l'informatique nationale représente <strong>31 % du total</strong>.</p>
+        <p>Côté régions, <strong>PACA</strong> et <strong>Grand Est</strong> (« DR Strasbourg ») dépassent chacune 450 M€, presque entièrement à cause de leurs marchés de formation 2024.</p>
+        <p><strong>Auvergne-Rhône-Alpes</strong> passe le plus de lots (109), mais de taille plus modeste.</p>
+        <p class="take">Attention aux doublons de nom : « Centre Val de Loire » et « Bourgogne Franche-Comté » apparaissent chacune sous deux libellés. Les deux libellés Centre-Val de Loire sont fusionnés ici (*).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Taille -->
+  <section>
+    <h3>5 · Taille des lots</h3>
+    <h2>Beaucoup de lots moyens, quelques géants</h2>
+    <div class="row">
+      <div class="chart">
+        <svg id="c-taille" role="img" aria-label="Nombre de lots par tranche de montant"></svg>
+      </div>
+      <div class="note">
+        <p>La moitié des lots valent moins de <strong>2,2 M€</strong> (médiane) ; le lot typique se situe entre 1 et 10 M€.</p>
+        <p>Mais les montants sont très concentrés : <strong>10 % des lots représentent 54 % de l'argent</strong>. Les 8 lots de plus de 50 M€ pèsent à eux seuls 24 %.</p>
+        <p>84 lots n'ont pas de montant renseigné et ne figurent pas dans ce total.</p>
+      </div>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Lot</th><th>Acheteur</th><th>Année</th><th class="num">Attributaires</th><th class="num">Montant</th></tr></thead>
+        <tbody id="t-top"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. Prestataires -->
+  <section>
+    <h3>6 · Qui gagne</h3>
+    <h2>Un marché très éclaté, avec quelques habitués</h2>
+    <div class="row">
+      <div class="chart">
+        <svg id="c-presta" role="img" aria-label="Nombre de prestataires selon le nombre de lots gagnés"></svg>
+      </div>
+      <div class="note">
+        <p>Sur 634 prestataires, <strong>347 n'ont gagné qu'un seul lot</strong> : beaucoup d'organismes de formation et d'insertion locaux.</p>
+        <p>À l'opposé, <strong>5 prestataires ont décroché plus de 30 lots</strong>. Le premier (identifiant 41) apparaît sur 105 lots.</p>
+        <p class="take">Le fichier ne donne que des identifiants. Pour savoir qui sont ces prestataires, il faut l'export de la table des prestataires.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Prestations -->
+  <section>
+    <h3>7 · Les dispositifs</h3>
+    <h2>Les prestations phares pour les demandeurs d'emploi</h2>
+    <div class="row">
+      <div class="chart">
+        <svg id="c-prest" role="img" aria-label="Montant par prestation nommée"></svg>
+      </div>
+      <div class="note">
+        <p>La colonne « prestation » nomme le dispositif acheté, mais elle n'est remplie que pour <strong>373 lots sur 739</strong>. Le graphique ne montre donc qu'une partie de l'activité (1,08 Md€).</p>
+        <p>En tête, le <strong>Parcours Emploi Santé</strong>, un accompagnement de personnes dont la santé freine le retour à l'emploi, puis <strong>Valoriser son image professionnelle</strong> et <strong>Activ'Projet</strong>.</p>
+        <p><strong>Agil'Cadres</strong> et <strong>Activ Créa</strong> (création d'entreprise) complètent le haut du classement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Qualité -->
+  <section>
+    <h3>8 · Fiabilité</h3>
+    <h2>Ce qu'il faut garder en tête</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Problème dans les données</th><th class="num">Lignes</th><th>Conséquence</th></tr></thead>
+        <tbody>
+          <tr><td>Montant du lot absent</td><td class="num">231</td><td>84 lots exclus des totaux : les montants sont sous-estimés.</td></tr>
+          <tr><td>Date fictive « 1001-01-01 » ou date vide</td><td class="num">54</td><td>28 lots (61 M€) sans année, montrés à part.</td></tr>
+          <tr><td>Prestation non renseignée</td><td class="num">1 136</td><td>Le graphique des dispositifs est partiel.</td></tr>
+          <tr><td>Catégorie absente</td><td class="num">31</td><td>Regroupés sous « Non renseignée ».</td></tr>
+          <tr><td>Acheteur absent</td><td class="num">15</td><td>Dont le marché de conseil en évolution professionnelle 2023 (540 M€ de plafond).</td></tr>
+          <tr><td><span class="pill w">Incohérent</span> Montant du lot supérieur à celui du marché</td><td class="num">4</td><td>Marché 23-127034 (Parcours Emploi Santé) : à vérifier à la source.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--ink-2)">Les montants sont en général des <strong>maximums d'accords-cadres</strong>, pas des sommes réellement dépensées. Ils indiquent l'enveloppe engagée, pas la consommation.</p>
+  </section>
+
+  <footer>
+    <span>Source : export_lots.csv, 2 061 lignes, nettoyé avec nettoyer_lots.py. Totaux calculés sur lots_uniques.csv (un lot compté une fois).</span>
+    <span>Survolez les barres pour voir le détail.</span>
+  </footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const NAT = 'nat', REG = 'reg', NA = 'na';
+const D = {
+  attr: [["1",282],["2",160],["3",107],["4",89],["5",34],["6–10",53],["11–20",11],["21+",3]],
+  annee: [["Avant 2021",202.4,18],["2021",254.5,44],["2022",282.4,127],["2023",603.1,116],["2024",1212.4,305],["2025",890.8,101],["Sans date",60.9,28]],
+  cat: [["Formation",1095.1,253],["Sécurité numérique",609.4,22],["Accompagnement",518.2,144],["Échanges avec Pôle Emploi",504.1,26],["Insertion",504.1,154],["Conseil en évolution prof.",63.8,3],["Communication",49.9,19],["Prospection d'offres",45.9,23],["Personnels",40.0,36],["Expertises",26.8,3],["RH externalisée",21.9,19],["Aides à la reprise d'emploi",4.1,21],["Management",2.0,2],["Accueil",0.6,5],["Non renseignée",20.8,9]],
+  ach: [["DGA SI – Montreuil",816.8,35,NAT],["DR PACA",459.5,65,REG],["DR Grand Est (Strasbourg)",450.8,52,REG],["DSI – Castelnau",271.5,7,NAT],["DR Nouvelle-Aquitaine",263.8,53,REG],["DR Auvergne-Rhône-Alpes",242.1,109,REG],["Direction générale",185.1,69,NAT],["Non renseigné",108.8,7,NA],["Direction comptable",79.8,69,NAT],["DR Hauts-de-France",74.7,29,REG],["DR Normandie",69.9,25,REG],["Centre-Val de Loire*",102.0,24,REG],["DR La Réunion",65.1,29,REG],["DR Île-de-France",63.8,23,REG],["DR Pays de la Loire",54.2,29,REG],["Autres (13 acheteurs)",198.3,114,NA]],
+  taille: [["< 100 k€",26],["100 k€ – 1 M€",181],["1 – 10 M€",368],["10 – 50 M€",72],["≥ 50 M€",8],["Montant inconnu",84]],
+  presta: [["1 lot",347],["2 lots",97],["3 à 5",105],["6 à 10",50],["11 à 30",30],["Plus de 30",5]],
+  prest: [["Parcours Emploi Santé",255.6,51],["Valoriser son image pro.",232.0,46],["Activ'Projet",197.5,40],["Agil'Cadres",134.8,25],["Activ Créa",106.5,29],["Atelier Conseil",59.8,27],["Formation en situation de travail",26.0,41],["Activ Créa + Atelier + ESPR",20.5,7],["Direction emploi",13.1,29],["Autres dispositifs (13)",31.1,78]],
+  top: [["SI Cœur de métiers France Travail (25-50629, lot 1)","DGA SI – Montreuil","2025",3,260.0],["Ingénierie technique, production (25-50629, lot 10)","DGA SI – Montreuil","2025",4,159.0],["Traitement des documents (19-191978, lot 2)","DSI – Castelnau","2019",1,80.0],["Appui à distance, lot b (21-155994)","DSI – Castelnau","2021",1,79.2],["Appui à distance, lot a (21-155994)","DSI – Castelnau","2021",1,76.9],["Ligne produits SI Support (25-50629, lot 9)","DGA SI – Montreuil","2025",3,76.0],["Conseil en évolution pro. Île-de-France (23-167713, lot 1)","Non renseigné","2023",3,63.8],["Numérisation et saisie des documents (25-34020, lot 1)","DGA SI – Montreuil","2025",1,61.6]]
+};
+// "Centre-Val de Loire*" fusionne les deux libellés (69,7 + 32,3 M€).
+
+const NS = 'http://www.w3.org/2000/svg';
+const fr = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+const euro = v => v >= 1000 ? fr.format(v / 1000) + ' Md€' : fr.format(v) + ' M€';
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const tip = document.getElementById('tip');
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; }
+function hover(target, html) {
+  target.addEventListener('mousemove', ev => { tip.innerHTML = html; tip.style.opacity = 1;
+    const x = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8); tip.style.left = x + 'px'; tip.style.top = (ev.clientY + 14) + 'px'; });
+  target.addEventListener('mouseleave', () => tip.style.opacity = 0);
+}
+// Barre arrondie côté valeur, carrée côté base
+function hPath(x, y, w, h, r) { r = Math.min(r, w); return `M${x},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h-r}Q${x+w},${y+h} ${x+w-r},${y+h}H${x}Z`; }
+function vPath(x, y, w, h, r) { r = Math.min(r, h); return `M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`; }
+function niceMax(v) { const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; }
+
+function hbar(id, rows, o) {
+  const svg = document.getElementById(id); svg.innerHTML = '';
+  const W = Math.round(svg.getBoundingClientRect().width) || 640, small = W < 520, lab = Math.min(o.labelW || 190, W * 0.42), right = small ? 62 : 80, bh = 18, gap = 12, top = 22, fs = small ? 11.5 : 13;
+  const H = top + rows.length * (bh + gap) + 4;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const max = niceMax(Math.max(...rows.map(r => r[1]))), pw = W - lab - right, sx = v => v / max * pw;
+  for (let i = 0; i <= 4; i++) { const x = lab + pw * i / 4;
+    el('line', { x1: x, x2: x, y1: top - 6, y2: H, stroke: css('--grid'), 'stroke-width': 1 }, svg);
+    el('text', { x, y: 12, 'text-anchor': 'middle', 'font-size': 11, fill: css('--muted') }, svg).textContent = o.fmtAxis(max * i / 4); }
+  rows.forEach((r, i) => {
+    const y = top + i * (bh + gap), w = Math.max(sx(r[1]), 1.5);
+    const g = el('g', {}, svg);
+    el('rect', { x: 0, y: y - gap / 2, width: W, height: bh + gap, fill: 'transparent' }, g);
+    const lt = el('text', { x: lab - 8, y: y + bh / 2 + 4, 'text-anchor': 'end', 'font-size': fs, fill: css('--ink-2') }, g); lt.textContent = r[0];
+    while (lt.getComputedTextLength() > lab - 12 && lt.textContent.length > 4) lt.textContent = lt.textContent.slice(0, -2) + '…';
+    el('path', { d: hPath(lab, y, w, bh, 4), fill: css(o.color(r)) }, g);
+    el('text', { x: lab + w + 6, y: y + bh / 2 + 4, 'font-size': 12, fill: css('--ink'), 'font-weight': 600 }, g).textContent = o.fmt(r[1]);
+    hover(g, o.tip(r));
+  });
+  el('line', { x1: lab, x2: lab, y1: top - 6, y2: H, stroke: css('--axis'), 'stroke-width': 1 }, svg);
+}
+function vbar(id, rows, o) {
+  const svg = document.getElementById(id); svg.innerHTML = '';
+  const W = Math.round(svg.getBoundingClientRect().width) || 640, H = W < 520 ? 260 : 300, left = 46, bottom = 40, top = 22, pw = W - left - 8, ph = H - top - bottom;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const max = niceMax(Math.max(...rows.map(r => r[1]))), band = pw / rows.length, bw = Math.min(band * 0.6, 44);
+  for (let i = 0; i <= 4; i++) { const y = top + ph - ph * i / 4;
+    el('line', { x1: left, x2: W - 8, y1: y, y2: y, stroke: css(i ? '--grid' : '--axis'), 'stroke-width': 1 }, svg);
+    el('text', { x: left - 8, y: y + 4, 'text-anchor': 'end', 'font-size': 11, fill: css('--muted') }, svg).textContent = o.fmtAxis(max * i / 4); }
+  rows.forEach((r, i) => {
+    const cx = left + band * i + band / 2, h = Math.max(r[1] / max * ph, 1.5), y = top + ph - h;
+    const g = el('g', {}, svg);
+    el('rect', { x: cx - band / 2, y: top, width: band, height: ph + bottom, fill: 'transparent' }, g);
+    el('path', { d: vPath(cx - bw / 2, y, bw, h, 4), fill: css(o.color(r, i)) }, g);
+    el('text', { x: cx, y: y - 7, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: css('--ink') }, g).textContent = o.fmt(r[1]);
+    const parts = band < 80 && r[0].includes(' ') ? [r[0].slice(0, r[0].indexOf(' ')), r[0].slice(r[0].indexOf(' ') + 1)] : [r[0]];
+    parts.forEach((t, k) => { el('text', { x: cx, y: top + ph + 16 + k * 13, 'text-anchor': 'middle', 'font-size': band < 60 ? 10.5 : 12, fill: css('--ink-2') }, g).textContent = t; });
+    hover(g, o.tip(r));
+  });
+}
+
+function draw() {
+  vbar('c-attr', D.attr, { fmt: v => v, fmtAxis: v => fr.format(v), color: (r, i) => i === 0 ? '--dim' : '--s1',
+    tip: r => `<b>${r[1]} lots</b> ont ${r[0]} attributaire${r[0] === '1' ? '' : 's'}` });
+  vbar('c-annee', D.annee, { fmt: euro, fmtAxis: v => v ? fr.format(v) + ' M' : '0', color: r => r[0] === '2024' ? '--s1' : r[0] === 'Sans date' ? '--dim' : '--s1',
+    tip: r => `<b>${r[0]}</b><br>${euro(r[1])} · ${r[2]} lots` });
+  hbar('c-cat', D.cat, { fmt: euro, fmtAxis: v => fr.format(v) + ' M', color: r => r[0] === 'Non renseignée' ? '--dim' : '--s1',
+    tip: r => `<b>${r[0]}</b><br>${euro(r[1])} · ${r[2]} lots<br>${fr.format(r[1] / r[2])} M€ par lot en moyenne` });
+  const moy = D.cat.filter(r => r[2] >= 5 && r[0] !== 'Non renseignée').map(r => [r[0], r[1] / r[2], r[2]]).sort((a, b) => b[1] - a[1]);
+  hbar('c-moy', moy, { fmt: v => fr.format(v) + ' M€', fmtAxis: v => fr.format(v) + ' M', color: () => '--s1',
+    tip: r => `<b>${r[0]}</b><br>${fr.format(r[1])} M€ par lot · ${r[2]} lots` });
+  const svgM = document.getElementById('c-moy');
+  const t = el('text', { x: 0, y: -8, 'font-size': 13, 'font-weight': 600, fill: css('--ink') }, svgM); t.textContent = 'Montant moyen par lot (catégories d’au moins 5 lots)';
+  svgM.setAttribute('viewBox', svgM.getAttribute('viewBox').replace(/^0 0/, '0 -26').replace(/ (\d+(\.\d+)?)$/, (m, h) => ' ' + (+h + 26)));
+  hbar('c-ach', D.ach, { labelW: 200, fmt: euro, fmtAxis: v => fr.format(v) + ' M', color: r => r[3] === NAT ? '--s2' : r[3] === NA ? '--dim' : '--s1',
+    tip: r => `<b>${r[0]}</b><br>${euro(r[1])} · ${r[2]} lots${r[0].includes('*') ? '<br>Deux libellés fusionnés' : ''}` });
+  vbar('c-taille', D.taille, { fmt: v => v, fmtAxis: v => fr.format(v), color: r => r[0] === 'Montant inconnu' ? '--dim' : '--s1',
+    tip: r => `<b>${r[0]}</b><br>${r[1]} lots` });
+  vbar('c-presta', D.presta, { fmt: v => v, fmtAxis: v => fr.format(v), color: () => '--s1',
+    tip: r => `<b>${r[1]} prestataires</b><br>ont gagné ${r[0].toLowerCase()}` });
+  hbar('c-prest', D.prest, { labelW: 220, fmt: euro, fmtAxis: v => fr.format(v) + ' M', color: r => r[0].startsWith('Autres') ? '--dim' : '--s1',
+    tip: r => `<b>${r[0]}</b><br>${euro(r[1])} · ${r[2]} lots` });
+}
+document.getElementById('t-top').innerHTML = D.top.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td><td class="num">${fr.format(r[4])} M€</td></tr>`).join('');
+draw();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(draw, 120); });
+new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+</script>
