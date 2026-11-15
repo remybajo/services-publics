@@ -137,6 +137,21 @@ details.limite p { margin-top: 6px; font-size: 13px; }
 .carte .legende-carte .k0 { background: var(--c0); } .carte .legende-carte .k1 { background: var(--c1); } .carte .legende-carte .k2 { background: var(--c2); } .carte .legende-carte .k3 { background: var(--c3); } .carte .legende-carte .k4 { background: var(--c4); } .carte .legende-carte .kv { background: var(--c-vide); }
 .carte .titre-carte { font-size: 14px; font-weight: 600; flex-basis: 100%; color: var(--ink); }
 </style>
+<meta name="description" content="Santé, transports, La Poste, logement, éducation : six rapports chiffrés à partir de données publiques, avec cartes par département.">
+<link rel="canonical" href="https://services-publics.bajolet-remy.workers.dev/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Services publics : ce que disent les chiffres publics">
+<meta property="og:description" content="Santé, transports, La Poste, logement, éducation : six rapports chiffrés à partir de données publiques, avec cartes par département.">
+<meta property="og:url" content="https://services-publics.bajolet-remy.workers.dev/">
+<meta property="og:image" content="https://services-publics.bajolet-remy.workers.dev/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Services publics : ce que disent les chiffres publics">
+<meta name="twitter:description" content="Santé, transports, La Poste, logement, éducation : six rapports chiffrés à partir de données publiques, avec cartes par département.">
+<meta name="twitter:image" content="https://services-publics.bajolet-remy.workers.dev/partage.png">
 <style>
 .menu-site { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 10px 0 14px; border-bottom: 1px solid var(--ring); margin-bottom: 8px; }
 .menu-site a { font-size: 14px; font-weight: 600; color: var(--ink-2); text-decoration: none; }
@@ -148,13 +163,20 @@ details.limite p { margin-top: 6px; font-size: 13px; }
 .carte .eyebrow { font-size: 13px; }
 .carte strong { font-size: 18px; line-height: 1.3; }
 .carte span:last-child { font-size: 13px; color: var(--ink-2); }
+</style><style>
+.pied-site { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--ring); font-size: 13px; color: var(--ink-2); display: grid; gap: 6px; }
+.pied-site a { color: var(--ink-2); }
+.dates-donnees { font-size: 13px; color: var(--ink-2); }
+.citer { font-family: ui-monospace, monospace; font-size: 12px; background: var(--accent-wash); padding: 8px 10px; border-radius: 6px; }
+.telecharger { font-size: 14px; font-weight: 600; }
+@media print { .menu-site, .sommaire, #filtre, .carte .choix { display: none; } body { background: #fff; } }
 </style>
 </head>
 <body>
-<div class="wrap"><nav class="menu-site" aria-label="Thèmes"><a class="marque" href="index.html" aria-current="page">Services publics</a><a href="sante.html">Santé</a><a href="transports.html">Transports</a><a href="poste.html">La Poste</a><a href="logement.html">Logement</a><a href="education.html">Éducation</a><a href="territoires.html">Territoires</a></nav>
+<div class="wrap"><nav class="menu-site" aria-label="Thèmes"><a class="marque" href="index.html" aria-current="page">Services publics</a><a href="sante.html">Santé</a><a href="transports.html">Transports</a><a href="poste.html">La Poste</a><a href="logement.html">Logement</a><a href="education.html">Éducation</a><a href="territoires.html">Territoires</a><a href="presse.html">Presse</a><a href="methode.html">Méthode</a></nav>
 <header>
   <div class="eyebrow">Services publics · données publiques</div>
-  <h1>Ce que les chiffres publics disent de l'état des services publics</h1>
+  <h1>Services publics : ce que disent les chiffres publics</h1>
   <p class="lead">Santé, transports, La Poste, logement, éducation, et leur croisement par département : six rapports construits uniquement à partir de données publiques. Chaque chiffre peut être recalculé ou vérifié à la source, et chaque graphique est accompagné de ses limites.</p>
 </header>
 <section>
@@ -164,6 +186,13 @@ details.limite p { margin-top: 6px; font-size: 13px; }
   <h3>Méthode</h3>
   <p>Chaque rapport suit la même chaîne : téléchargement des données publiques, nettoyage par script sans correction à la main, puis calcul de chaque chiffre par script à partir de la source brute. Les encadrés « Notre lecture » signalent les interprétations ; les limites des données figurent à côté des chiffres et dans la section « Fiabilité » de chaque rapport.</p>
 </section>
+
+<footer class="pied-site">
+  <p>Site réalisé par Rémy Bajolet (responsable de publication : Rémy Bajolet, À_CONFIRMER), à partir de données publiques ouvertes. Affiliation : À_CONFIRMER. Contact : À_CONFIRMER.</p>
+  <p>Publié le 15 novembre 2026, mis à jour le 15 novembre 2026. <a href="methode.html">Méthode et sources</a> · <a href="corrections.html">Corrections</a> · <a href="presse.html">Presse</a></p>
+  <p>Textes et graphiques sous licence <a href="https://creativecommons.org/licenses/by/4.0/deed.fr">CC BY 4.0</a> ; les données gardent la licence de leur producteur (Licence Ouverte, ODbL pour les données SNCF et une partie des données de La Poste).</p>
+  <p>Comment citer : <span class="citer">Rémy Bajolet, « Services publics : ce que disent les chiffres publics », https://services-publics.bajolet-remy.workers.dev, version du 15 novembre 2026, licence CC BY 4.0.</span></p>
+</footer>
 </div>
 </body>
 </html>

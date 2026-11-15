@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dossier de presse · Services publics</title>
+<style>
+/* Mise en page : rapport en une colonne de lecture, chaque section = un graphique + son explication à côté (empilés sur mobile) */
+:root {
+  --bg: #f6f7f9;
+  --surface: #fcfcfb;
+  --ink: #0f1720;
+  --ink-2: #4a5260;
+  --muted: #858b94;
+  --grid: #e1e3e8;
+  --axis: #c3c6cd;
+  --ring: rgba(15,23,32,.10);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --dim: #b9bec7;
+  --accent-wash: #e8f0fb;
+  --warn: #d03b3b;
+  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --surface: #1a1b1e; --ink: #f4f5f7; --ink-2: #c3c6cd; --muted: #8b9099;
+    --grid: #2c2e33; --axis: #3a3d43; --ring: rgba(255,255,255,.10);
+    --s1: #3987e5; --s2: #d95926; --dim: #4b4f57; --accent-wash: #1b2a3d; --warn: #e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --surface: #1a1b1e; --ink: #f4f5f7; --ink-2: #c3c6cd; --muted: #8b9099;
+  --grid: #2c2e33; --axis: #3a3d43; --ring: rgba(255,255,255,.10);
+  --s1: #3987e5; --s2: #d95926; --dim: #4b4f57; --accent-wash: #1b2a3d; --warn: #e66767;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 48px 72px; display: grid; gap: 56px; }
+header { display: grid; gap: 14px; max-width: 760px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--s1); }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1; font-weight: 800; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+h2 { font-size: 24px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+h3 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 65ch; }
+.lead { font-size: 18px; color: var(--ink-2); }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 18px; display: grid; gap: 4px; }
+.tile .v { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+.tile .l { font-size: 14px; color: var(--ink-2); }
+section { display: grid; gap: 18px; }
+.row { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.chart { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 18px 18px 10px; min-width: 0; display: grid; gap: 10px; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart svg text { font-family: var(--font); }
+.note { display: grid; gap: 12px; min-width: 0; }
+.note p { color: var(--ink-2); }
+.note strong { color: var(--ink); }
+.take { border-left: 3px solid var(--s1); padding: 4px 0 4px 14px; color: var(--ink); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--accent-wash); color: var(--ink); white-space: nowrap; }
+.pill.w { background: color-mix(in srgb, var(--warn) 16%, transparent); }
+.trap { display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 20px; }
+.lines { display: grid; gap: 6px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.lines div { display: grid; grid-template-columns: 9ch 1fr; gap: 10px; align-items: center; }
+.lines b { display: block; height: 22px; border-radius: 0 4px 4px 0; }
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.4; padding: 8px 10px; border-radius: 6px; max-width: 280px; opacity: 0; transition: opacity .1s; }
+#tip b { font-weight: 600; }
+footer { font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
+@media (max-width: 820px) {
+  .row { grid-template-columns: minmax(0,1fr); gap: 18px; }
+  .tiles { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { #tip { transition: none; } }
+</style>
+<style>
+/* Couleurs supplémentaires (séries multiples), sommaire, parties, recherche */
+:root { --s3: #1f9e89; --s4: #8a5cd6; --s5: #c99a06; --s6: #c2417a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --s3: #3cc2a9; --s4: #a883ec; --s5: #e0b52c; --s6: #e0679b; } }
+:root[data-theme="dark"] { --s3: #3cc2a9; --s4: #a883ec; --s5: #e0b52c; --s6: #e0679b; }
+.sommaire { display: flex; flex-wrap: wrap; gap: 8px; }
+.sommaire a { font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 99px; background: var(--accent-wash); }
+.partie { border-top: 2px solid var(--ink); padding-top: 18px; display: grid; gap: 6px; }
+.partie .eyebrow { font-size: 14px; }
+#filtre { font: inherit; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--ring); background: var(--surface); color: var(--ink); width: 100%; max-width: 360px; }
+@media (max-width: 720px) { .row { grid-template-columns: minmax(0, 1fr); } .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+a { color: var(--s1); }
+</style>
+<style>
+/* Mise en forme : accent de couleur, synthèse des chiffres, lectures signalées, limites discrètes */
+:root { --alerte: #c8102e; --alerte-fond: #fdecee; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alerte: #ff5c6f; --alerte-fond: #3a1419; } }
+:root[data-theme="dark"] { --alerte: #ff5c6f; --alerte-fond: #3a1419; }
+.eyebrow { color: var(--alerte); }
+h1 { letter-spacing: -.025em; }
+.casse { background: var(--alerte-fond); border-left: 6px solid var(--alerte); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; }
+.casse h2 { color: var(--alerte); font-size: 22px; }
+.casse ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.casse li { font-size: 17px; line-height: 1.45; }
+.casse li strong { color: var(--alerte); }
+.lecture { border: 2px solid var(--alerte); border-radius: 10px; padding: 12px 16px; display: grid; gap: 6px; }
+.lecture .titre-lecture { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--alerte); }
+.take { border-left-color: var(--alerte); }
+.note p.limite { font-size: 13px; color: var(--ink-2); }
+details.limite { font-size: 13px; color: var(--ink-2); }
+details.limite summary { cursor: pointer; }
+details.limite p { margin-top: 6px; font-size: 13px; }
+.tile .v { color: var(--alerte); }
+</style>
+<style>
+/* Cartes par département : 5 classes du plus clair au plus foncé, gris = pas de donnée */
+:root { --c0: #fde3e0; --c1: #f8b4ab; --c2: #ee7e73; --c3: #d9453f; --c4: #9c1420; --c-vide: #d9dce1; --c-trait: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c0: #4a2326; --c1: #7a2f33; --c2: #ad3f42; --c3: #e0605e; --c4: #ffaaa0; --c-vide: #3a3f47; --c-trait: #14171c; } }
+:root[data-theme="dark"] { --c0: #4a2326; --c1: #7a2f33; --c2: #ad3f42; --c3: #e0605e; --c4: #ffaaa0; --c-vide: #3a3f47; --c-trait: #14171c; }
+.carte { display: grid; gap: 10px; }
+.carte .choix { display: flex; flex-wrap: wrap; gap: 6px; }
+.carte .choix button { font: inherit; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--ring); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.carte .choix button[aria-pressed="true"] { background: var(--alerte); border-color: var(--alerte); color: #fff; }
+.carte .cadre { position: relative; }
+.carte svg { width: 100%; height: auto; display: block; }
+.carte path { stroke: var(--c-trait); stroke-width: .6; cursor: pointer; }
+.carte path:hover { stroke: var(--ink); stroke-width: 1.6; }
+.carte .k0 { fill: var(--c0); } .carte .k1 { fill: var(--c1); } .carte .k2 { fill: var(--c2); } .carte .k3 { fill: var(--c3); } .carte .k4 { fill: var(--c4); } .carte .kv { fill: var(--c-vide); }
+.carte .bulle { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 13px; line-height: 1.35; padding: 6px 10px; border-radius: 6px; max-width: 220px; display: none; z-index: 2; }
+.carte .legende-carte { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); }
+.carte .legende-carte i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.carte .legende-carte .k0 { background: var(--c0); } .carte .legende-carte .k1 { background: var(--c1); } .carte .legende-carte .k2 { background: var(--c2); } .carte .legende-carte .k3 { background: var(--c3); } .carte .legende-carte .k4 { background: var(--c4); } .carte .legende-carte .kv { background: var(--c-vide); }
+.carte .titre-carte { font-size: 14px; font-weight: 600; flex-basis: 100%; color: var(--ink); }
+</style>
+<style>
+.pied-site { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--ring); font-size: 13px; color: var(--ink-2); display: grid; gap: 6px; }
+.pied-site a { color: var(--ink-2); }
+.dates-donnees { font-size: 13px; color: var(--ink-2); }
+.citer { font-family: ui-monospace, monospace; font-size: 12px; background: var(--accent-wash); padding: 8px 10px; border-radius: 6px; }
+.telecharger { font-size: 14px; font-weight: 600; }
+@media print { .menu-site, .sommaire, #filtre, .carte .choix { display: none; } body { background: #fff; } }
+</style>
+<meta name="description" content="Chiffres sur les services publics en France, avec leur source, leur période et leurs limites.">
+<link rel="canonical" href="https://services-publics.bajolet-remy.workers.dev/presse">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Services publics : dossier de presse">
+<meta property="og:description" content="Chiffres sur les services publics en France, avec leur source, leur période et leurs limites.">
+<meta property="og:url" content="https://services-publics.bajolet-remy.workers.dev/presse">
+<meta property="og:image" content="https://services-publics.bajolet-remy.workers.dev/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Services publics : dossier de presse">
+<meta name="twitter:description" content="Chiffres sur les services publics en France, avec leur source, leur période et leurs limites.">
+<meta name="twitter:image" content="https://services-publics.bajolet-remy.workers.dev/partage.png"><style>
+.menu-site { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 10px 0 14px; border-bottom: 1px solid var(--ring); margin-bottom: 8px; }
+.menu-site a { font-size: 14px; font-weight: 600; color: var(--ink-2); text-decoration: none; }
+.menu-site a[aria-current="page"] { color: var(--alerte, var(--ink)); text-decoration: underline; text-underline-offset: 4px; }
+.menu-site .marque { color: var(--ink); margin-right: 8px; }
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.carte { display: grid; gap: 8px; align-content: start; padding: 18px; border-radius: 12px; background: var(--surface); border: 1px solid var(--ring); color: var(--ink); text-decoration: none; }
+.carte:hover { border-color: var(--ink-2); }
+.carte .eyebrow { font-size: 13px; }
+.carte strong { font-size: 18px; line-height: 1.3; }
+.carte span:last-child { font-size: 13px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="wrap"><nav class="menu-site" aria-label="Thèmes"><a class="marque" href="index.html">Services publics</a><a href="sante.html">Santé</a><a href="transports.html">Transports</a><a href="poste.html">La Poste</a><a href="logement.html">Logement</a><a href="education.html">Éducation</a><a href="territoires.html">Territoires</a><a href="presse.html" aria-current="page">Presse</a><a href="methode.html">Méthode</a></nav>
+<header>
+  <div class="eyebrow">Services publics · données publiques</div>
+  <h1>Dossier de presse</h1>
+  <p class="lead">Les chiffres principaux du site, avec leur période, leur source et leur limite principale. Chaque chiffre renvoie au rapport où il est détaillé.</p>
+</header>
+<section id="chiffres">
+  <h2>Dix chiffres</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Chiffre</th><th>Période</th><th>Source</th><th>Limite</th><th>Détail</th></tr></thead>
+    <tbody><tr id="chiffre-1"><td><strong>412 788 lits d'hospitalisation complète en 2013, 367 335 en 2024</strong></td><td>2013-2024</td><td><a href="https://data.drees.solidarites-sante.gouv.fr/explore/dataset/graphique-1-evolution-du-nombre-de-lits-et-de-places-au-31-decembre-depuis-fin-2013/">DREES</a></td><td>Tous établissements, publics et privés ; les places d'hospitalisation partielle augmentent de 23 449 sur la même période.</td><td><a href="sante.html">Rapport</a></td></tr><tr id="chiffre-2"><td><strong>535 maternités en 2013, 445 en 2024</strong></td><td>2013-2024</td><td><a href="https://data.drees.solidarites-sante.gouv.fr/explore/dataset/fichier_maternites_112021/">DREES</a></td><td>Solde net : une maternité qui disparaît de la liste peut avoir fermé ou fusionné.</td><td><a href="sante.html">Rapport</a></td></tr><tr id="chiffre-3"><td><strong>12,4 millions d'habitants en commune sous-dotée en médecins généralistes en 2024, contre 10,0 millions en 2022</strong></td><td>2022-2024</td><td><a href="https://data.drees.solidarites-sante.gouv.fr/explore/dataset/530_l-accessibilite-potentielle-localisee-apl/">DREES</a></td><td>Commune sous-dotée : 2,5 consultations par an et par habitant ou moins ; la hausse reflète en partie l'évolution de la population.</td><td><a href="sante.html">Rapport</a></td></tr><tr id="chiffre-4"><td><strong>9 555 bureaux de poste en 2015, 6 584 en 2025</strong></td><td>2015-2025</td><td><a href="https://catalogue-donnees.insee.fr/fr/catalogue/recherche/DS_BPE_EVOLUTION">Insee</a></td><td>Les agences postales tenues par les communes et les relais chez des commerçants augmentent sur la même période.</td><td><a href="poste.html">Rapport</a></td></tr><tr id="chiffre-5"><td><strong>14,4 bureaux de poste pour 100 000 habitants en 2015, 9,6 en 2025</strong></td><td>2015-2025</td><td><a href="https://catalogue-donnees.insee.fr/fr/catalogue/recherche/DS_ESTIMATION_POPULATION">Insee</a></td><td>Population 2025 provisoire.</td><td><a href="poste.html">Rapport</a></td></tr><tr id="chiffre-6"><td><strong>67 980 logements sociaux mis en service en 2024, contre 86 987 en 2015</strong></td><td>2015-2024</td><td><a href="https://www.statistiques.developpement-durable.gouv.fr/54-millions-de-logements-locatifs-sociaux-en-france-au-1er-janvier-2025">SDES</a></td><td>France métropolitaine ; une mise en service n'est pas une construction (achats sur plan et acquisitions compris).</td><td><a href="logement.html">Rapport</a></td></tr><tr id="chiffre-7"><td><strong>18,00 Md€ d'aides personnelles au logement en 2017, 16,43 Md€ en 2025</strong></td><td>2017-2025</td><td><a href="https://www.statistiques.developpement-durable.gouv.fr/rapport-du-compte-du-logement-2025">SDES</a></td><td>Euros courants, sans correction de l'inflation.</td><td><a href="logement.html">Rapport</a></td></tr><tr id="chiffre-8"><td><strong>26 778 km de lignes classiques gérées par SNCF Réseau en 2015, 24 362 km en 2024</strong></td><td>2015-2024</td><td><a href="https://www.autorite-transports.fr/observatoire-et-numerique/jeux-de-donnees-en-open-data/">ART</a></td><td>Sorties du réseau toutes causes confondues, y compris les transferts de gestion aux régions.</td><td><a href="transports.html">Rapport</a></td></tr><tr id="chiffre-9"><td><strong>Fréquentation des TER +71,3 %, places offertes +32,9 %</strong></td><td>2015-2024</td><td><a href="https://www.autorite-transports.fr/observatoire-et-numerique/jeux-de-donnees-en-open-data/">ART</a></td><td>Passagers-km et sièges-km ; Intercités transférés aux régions comptés en TER.</td><td><a href="transports.html">Rapport</a></td></tr><tr id="chiffre-10"><td><strong>Étudiants des établissements privés +60,1 %, du public +8,8 %</strong></td><td>2015-16 à 2025-26</td><td><a href="https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-atlas_regional-effectifs-d-etudiants-inscrits_agregeables/">SIES</a></td><td>La source ne distingue pas le privé lucratif du privé non lucratif.</td><td><a href="education.html">Rapport</a></td></tr></tbody>
+  </table></div>
+</section>
+<section id="precaution">
+  <h2>À manier avec précaution</h2>
+  <ul><li><strong>Écoles publiques en moins depuis 2009</strong> : Solde de numéros d'établissement : fusions et changements de numéro compris. Rapporté aux enfants de moins de 10 ans, la baisse est de 2,6 %. <a href="education.html">Voir le rapport</a>.</li><li><strong>Départements les plus mal placés (page Territoires)</strong> : Comptage relatif construit pour ce site : un cinquième des départements est classé défavorable par construction ; mélange de niveaux et d'évolutions. <a href="territoires.html">Voir le rapport</a>.</li><li><strong>Gares sans guichet</strong> : Photographie : données traitées en février 2024 ; « sans guichet » ne veut pas dire « sans automate ». <a href="transports.html">Voir le rapport</a>.</li><li><strong>Élèves par enseignant en primaire (Eurostat)</strong> : Eurostat signale une définition différente pour la France ; un ratio n'est pas une taille de classe. <a href="education.html">Voir le rapport</a>.</li><li><strong>Salaires des enseignants (OCDE)</strong> : Indice de salaire statutaire hors primes, corrigé de l'inflation par l'OCDE. <a href="education.html">Voir le rapport</a>.</li><li><strong>Habitants sans bureau de poste dans leur commune</strong> : Mesure l'absence de bureau dans la commune, pas la distance ; population 2022 et liste de La Poste d'octobre 2026. <a href="poste.html">Voir le rapport</a>.</li></ul>
+</section>
+<section id="contact">
+  <h2>Contact et réutilisation</h2>
+  <p>Contact : À_CONFIRMER. Textes et graphiques réutilisables sous licence CC BY 4.0, avec la mention suivante :</p>
+  <p class="citer">Rémy Bajolet, « Services publics : ce que disent les chiffres publics », https://services-publics.bajolet-remy.workers.dev, version du 15 novembre 2026, licence CC BY 4.0.</p>
+  <p>Les tableaux départementaux de chaque rapport se téléchargent en CSV depuis la page du rapport.</p>
+</section>
+<footer class="pied-site">
+  <p>Site réalisé par Rémy Bajolet (responsable de publication : Rémy Bajolet, À_CONFIRMER), à partir de données publiques ouvertes. Affiliation : À_CONFIRMER. Contact : À_CONFIRMER.</p>
+  <p>Publié le 15 novembre 2026, mis à jour le 15 novembre 2026. <a href="methode.html">Méthode et sources</a> · <a href="corrections.html">Corrections</a> · <a href="presse.html">Presse</a></p>
+  <p>Textes et graphiques sous licence <a href="https://creativecommons.org/licenses/by/4.0/deed.fr">CC BY 4.0</a> ; les données gardent la licence de leur producteur (Licence Ouverte, ODbL pour les données SNCF et une partie des données de La Poste).</p>
+  <p>Comment citer : <span class="citer">Rémy Bajolet, « Services publics : ce que disent les chiffres publics », https://services-publics.bajolet-remy.workers.dev, version du 15 novembre 2026, licence CC BY 4.0.</span></p>
+</footer>
+</div>
+</body>
+</html>
