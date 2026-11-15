@@ -24,21 +24,13 @@ python3 assembler_site.py
 
 (même enchaînement pour `transports`, `poste`, `logement`, `education` ; `calculer_chiffres_comparaisons.py` rapporte ensuite les services à la population et les compare à l'Europe et à l'OCDE, avant la génération des rapports ; `calculer_chiffres_territoires.py` et `generer_rapport_territoires.py` croisent les cinq thèmes.)
 
-## Données
+## Données et méthode
 
-Les données ne sont pas versionnées dans ce dépôt (plusieurs centaines de Mo) : elles se retéléchargent depuis leurs producteurs et se placent dans `donnees_brutes/<thème>/`. Les sources exactes, leurs dates et leurs licences sont indiquées dans la section « Sources » de chaque rapport.
+Les données ne sont pas versionnées dans ce dépôt (plusieurs centaines de Mo) : elles se retéléchargent depuis leurs producteurs et se placent dans `donnees_brutes/<thème>/`. La liste complète des jeux de données, avec lien direct, licence et date de téléchargement, figure sur la page « Méthode et sources » du site (`site_services_publics/methode.html`, générée à partir de `kit_presse.py`).
 
-| Thème | Producteurs | Licences |
-|---|---|---|
-| Santé | DREES | Licence Ouverte (licence non renseignée pour deux jeux, signalé dans le rapport) |
-| Transports | SNCF Open Data, Autorité de régulation des transports, Cerema | ODbL (SNCF), Licence Ouverte |
-| La Poste | Insee, La Poste | Licence Ouverte, ODbL (horaires, boîtes aux lettres) |
-| Logement | SDES, ministère du Logement, Cnaf | Licence Ouverte |
-| Éducation | DEPP, SIES | Licence Ouverte v2.0 |
-| Comparaisons | Insee (estimations de population), Eurostat, OCDE | Licence Ouverte, CC BY 4.0 |
-| Cartes | Etalab, contours administratifs 2024 (inclus dans `donnees_brutes/cartes/`) | Licence Ouverte |
+Producteurs : DREES (santé) ; Autorité de régulation des transports et SNCF (transports) ; Insee et La Poste (réseau postal) ; SDES, ministère chargé du logement et Cnaf (logement) ; DEPP et SIES (éducation) ; Insee, OCDE et Eurostat (comparaisons) ; Etalab (fond de carte, inclus dans `donnees_brutes/cartes/`). Licences : Licence Ouverte pour la plupart ; ODbL pour les données SNCF et une partie des données de La Poste ; CC BY 4.0 pour l'OCDE et Eurostat.
 
-Les rapports qui réutilisent des données sous ODbL en citent la source, conformément à cette licence.
+Textes et graphiques du site : licence CC BY 4.0. Auteur : Rémy Bajolet.
 
 ## Règles du projet
 
