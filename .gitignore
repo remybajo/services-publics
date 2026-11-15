@@ -11,3 +11,7 @@ site_sante/
 __pycache__/
 .DS_Store
 .claude/launch.json
+
+# Notes de travail (conservées en local, hors dépôt)
+CLAUDE.md
+.claude/

@@ -26,7 +26,7 @@ python3 assembler_site.py
 
 ## Données
 
-Les données ne sont pas versionnées dans ce dépôt (plusieurs centaines de Mo) : elles se retéléchargent depuis leurs producteurs et se placent dans `donnees_brutes/<thème>/`. Les sources exactes, leurs dates et leurs licences sont indiquées dans la section « Sources » de chaque rapport et dans le registre des décisions (`.claude/memory/EDR.md`, entrées EDR-019 à EDR-024).
+Les données ne sont pas versionnées dans ce dépôt (plusieurs centaines de Mo) : elles se retéléchargent depuis leurs producteurs et se placent dans `donnees_brutes/<thème>/`. Les sources exactes, leurs dates et leurs licences sont indiquées dans la section « Sources » de chaque rapport.
 
 | Thème | Producteurs | Licences |
 |---|---|---|
@@ -42,7 +42,7 @@ Les rapports qui réutilisent des données sous ODbL en citent la source, confor
 
 ## Règles du projet
 
-Elles sont décrites dans `CLAUDE.md` et dans le registre des décisions (`.claude/memory/EDR.md`). Les principales :
+Les principales :
 
 - tout chiffre publié est recalculable à partir des données sources : aucune estimation ni extrapolation ;
 - les limites des données sont signalées à côté des chiffres ;
@@ -51,4 +51,4 @@ Elles sont décrites dans `CLAUDE.md` et dans le registre des décisions (`.clau
 
 ## État
 
-Les six rapports (santé, transports, La Poste, logement, éducation, territoires) ont été vérifiés chiffre par chiffre de façon indépendante, cartes et comparaisons comprises (version du 15 novembre 2026). Conformément à la décision EDR-025, ils ne retiennent que les analyses qui montrent un recul des services publics ; le contexte nécessaire à la lecture de chaque chiffre est conservé à côté de lui.
+Les six rapports (santé, transports, La Poste, logement, éducation, territoires) ont été vérifiés chiffre par chiffre de façon indépendante, cartes et comparaisons comprises (version du 15 novembre 2026). Ils ne retiennent que les analyses qui montrent un recul des services publics ; le contexte nécessaire à la lecture de chaque chiffre est conservé à côté de lui.
