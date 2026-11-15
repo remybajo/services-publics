@@ -172,6 +172,7 @@ def main():
         "europe_eleves_par_enseignant_primaire": eleves,
         "eleves_ex_aequo_france": [p for p in UE27 if p != "FR" and ee.get((p, eleves["annee_fin"])) == ee.get(("FR", eleves["annee_fin"]))],
         "eleves_pays_au_dessus": [p for p in UE27 if (ee.get((p, eleves["annee_fin"])) or 0) > ee[("FR", eleves["annee_fin"])]],
+        "eleves_valeurs_ue_fin": {p: ee[(p, eleves["annee_fin"])] for p in UE27 if (p, eleves["annee_fin"]) in ee},
         "europe_depense_education_pib": comparaison_pays(eurostat("eurostat_gov_10a_exp.json", {"cofog99": "GF09"}), "1995"),
         "definition": f"Écoles publiques (fiche éducation, rentrées {e0} et {e1}) rapportées aux enfants de moins de 10 ans au 1er janvier de la même année (Insee ; tranche plus large que l'âge de l'école primaire, faute de tranche plus fine), hors Mayotte aux deux dates ; une école en moins peut être une fusion. OCDE, Regards sur l'éducation (DSD_EAG_SAL_TREND@DF_TCH_STA) : indice des salaires statutaires des enseignants du primaire public après 15 ans d'expérience, base 100 en 2015, tel que publié. Eurostat educ_uoe_perp04 : élèves par enseignant dans le primaire (CITE 1). Eurostat gov_10a_exp : dépenses des administrations publiques pour l'enseignement (CFAP 09), en % du PIB.",
     }

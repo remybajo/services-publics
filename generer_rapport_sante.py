@@ -138,7 +138,7 @@ g_rea_dep = barres_h([(o["nom"], o["pour_100k"]) for o in rd[:k] + rd[-k:]], lam
                      couleur=lambda i, v: "var(--s2)" if i < k else "var(--s1)", coupure=k)
 s_rea_dep = section("0", "Réanimation par territoire", f"De {d(CD['rea_pour_100k_ecart'][0], 0)} à {d(CD['rea_pour_100k_ecart'][1], 0)} lits de réanimation pour 100&nbsp;000 habitants selon le département", g_rea_dep, f"""
   <p class="take">En moyenne, la France compte <strong>{d(CD['rea_pour_100k_national'])}</strong> lits de réanimation adulte pour 100&nbsp;000 habitants (fin 2024). Mais l'écart va de <strong>{d(CD['rea_pour_100k_ecart'][0])}</strong> ({rd[0]['nom']}) à <strong>{d(CD['rea_pour_100k_ecart'][1])}</strong> ({rd[-1]['nom']}).</p>
-  <p>Les taux les plus élevés se trouvent à {rd[-1]['nom']}, dans les {rd[-2]['nom']} et dans le {rd[-3]['nom']}. <em>Notre lecture :</em> les lits sont concentrés dans les grands pôles hospitaliers, et les habitants des départements les moins dotés dépendent de leurs voisins.</p>
+  <p>Les taux les plus élevés se trouvent à {rd[-1]['nom']}, dans les {rd[-2]['nom']} et dans le {rd[-3]['nom']}. <em>Notre lecture :</em> les lits sont concentrés dans les départements qui ont un grand centre hospitalier ; ailleurs, les patients en réanimation sont souvent pris en charge dans un département voisin.</p>
   <p><strong>{CD['deps_sans_rea_pediatrique']} départements sur {CD['nb_departements']}</strong> n'ont aucun lit de réanimation pédiatrique fin 2024.</p>
   <p><strong>Limite :</strong> le taux mesure où sont les lits, pas l'accès réel des habitants, qui dépend des distances et des transferts. La réanimation pédiatrique est concentrée dans quelques établissements par région ; son absence dans un département ne signifie pas une absence de prise en charge. Population totale Insee 2022.</p>""",
                     legende([(f"Les {k} moins dotés", "var(--s2)"), (f"Les {k} plus dotés", "var(--s1)")]))
@@ -467,7 +467,7 @@ fiab = f"""
     <tr><td>Médecins (RPPS)</td><td>Inscrits à l'Ordre et actifs, quel que soit le temps de travail ; densité non calculée par la DREES pour Mayotte en 2012-2013 ; extraction 2024 réalisée au 30 septembre, activité au 1er janvier reconstituée par la DREES</td><td>Mesure le nombre de médecins, pas le temps médical disponible</td></tr>
     <tr><td>Comptes de la santé</td><td>Euros courants, non corrigés de l'inflation ; moyennes nationales ; séries révisées à chaque édition ; secteur public = hôpitaux publics, militaires et privés non lucratifs ex-dotation globale</td><td>Le reste à charge moyen masque de fortes différences entre personnes</td></tr>
     <tr><td>Taille des maternités</td><td>Accouchements des seules maternités ouvertes au 31 décembre</td><td>Ne permet pas de compter le total des accouchements</td></tr>
-      <tr><td>Comparaisons (Insee, Eurostat)</td><td>Population 2024 et 2025 provisoire ; rupture de série Eurostat en 2013 pour les lits ; définition européenne différente de la statistique française</td><td>Ratios par habitant indicatifs ; ne pas comparer les chiffres Eurostat et SAE entre eux</td></tr>
+      <tr><td>Rapport à la population (Insee)</td><td>Estimations de population au 1er janvier, 2024 et 2025 provisoires</td><td>Ratios par habitant susceptibles de légères révisions</td></tr>
   </table></div>
   <p>Les séries nationales masquent de fortes différences entre territoires : les graphiques par département et le tableau en donnent un aperçu. Aucun indicateur n'est rapporté aux besoins de la population, sauf l'APL, qui tient compte de sa structure par âge ; selon la DREES, l'APL ne corrige pas le vieillissement entre deux millésimes.</p>
 </section>"""
@@ -479,33 +479,33 @@ sources = f"""
   <p>DREES, data.drees (téléchargement du {date}) : « Graphique 1 – Évolution du nombre de lits et de places au 31 décembre, depuis fin 2013 » ; « Effectifs salariés hospitaliers – Séries longues » ; « Lits de soins critiques des établissements de santé en France » ; « Liste des maternités de France depuis 2000 » ; « Accessibilité potentielle localisée (APL) aux professionnels de santé » ; « Séries longues corrigées du nombre de passages aux urgences 2017 à 2023 » ; « Base ARES – Agrégats régionaux sur les établissements de santé » (2013-2021) ; « La démographie des professionnels de santé depuis 2012 » (fichier Médecins RPPS 2012-2026) ; « Les comptes de la santé – Répartition par financeur » (édition 2026). Définition des secteurs public et privé hospitaliers : DREES, <a href="https://drees.solidarites-sante.gouv.fr/sites/default/files/2025-12/CNS%20-%20Fiche%2002%20-%20Les%20soins%20hospitaliers.pdf">Les dépenses de santé en 2024 (édition 2025), fiche « Les soins hospitaliers »</a>.</p>
   <p>Licences : Licence Ouverte v2.0 (Etalab) pour les effectifs, les maternités, l'APL, les urgences, la base ARES, la démographie des médecins et les comptes de la santé ; licence non renseignée pour les lits et places et pour les soins critiques.</p>
   <p>Commune sous-dotée en médecins généralistes (APL inférieur ou égal à {seuil} consultations par an et par habitant) : Insee, <a href="https://www.insee.fr/fr/statistiques/8677556">« L'accessibilité aux médecins généralistes se dégrade en Centre-Val de Loire »</a>, Insee Flash Centre-Val de Loire n° 101, décembre 2025 (même définition dans Insee Analyses Auvergne-Rhône-Alpes n° 187, décembre 2024).</p>
-  <p>Population : Insee, estimations localisées de population (Licence Ouverte). Comparaison européenne : Eurostat, lits d'hôpital (hlth_rs_bds1) ; Eurostat : réutilisation autorisée avec mention de la source (CC BY 4.0).</p>
+  <p>Population : Insee, estimations localisées de population (Licence Ouverte).</p>
   <p>Calculs rejouables : <code>calculer_chiffres_comparaisons.py</code> (comparaisons), <code>nettoyer_sante.py</code>, <code>calculer_chiffres_sante.py</code> puis <code>generer_rapport_sante.py</code> ; chiffres vérifiés de façon indépendante à partir des fichiers bruts.</p>
 </section>"""
 
 
 eua_u = eua["Établissements avec urgences autorisées"]
-casse = casse_en_chiffres("La casse en chiffres", [
+casse = casse_en_chiffres("En chiffres", [
     f"<strong>{n(abs(L['lits']['ecart']))} lits d'hospitalisation complète en moins</strong> entre {L['periode'][0]} et {L['periode'][1]} ({pct(L['lits']['pct'])}) ; {d(CP['sante']['lits_pour_1000']['fin'], 2)} lits pour 1 000 habitants contre {d(CP['sante']['lits_pour_1000']['debut'], 2)} ({pct(CP['sante']['lits_pour_1000']['pct'])}), et {pct(CP['sante']['lits_pour_1000_plus_75']['pct'])} pour 1 000 personnes de 75 ans ou plus ; les places d'hospitalisation partielle progressent de {pct(L['places']['pct'], False)}.",
     f"<strong>{abs(MA['total']['ecart'])} maternités en moins</strong> ({n(MA['total']['debut'])} en {MA['periode'][0]}, {n(MA['total']['fin'])} en {MA['periode'][1]}) ; les lits d'obstétrique reculent de {pct(abs(MA['lits_obstetrique']['pct']), False)}.",
     f"<strong>Un lit de chirurgie sur quatre</strong> a disparu entre {pa0} et {pa1} ({pct(em['Chirurgie']['pct'])}) ; la psychiatrie perd {n(abs(ps_l['evol']['Total']['ecart']))} lits à temps plein.",
     f"<strong>{abs(eua_u['ecart'])} établissements de moins</strong> avec un service d'urgences autorisé ({pa0}-{pa1}).",
     f"<strong>{d(apl_fin['population_sous_dense'] / 1e6)} millions d'habitants</strong> ({pct(apl_fin['part'], False)}) vivent en commune sous-dotée en généralistes en {apl_fin['annee']}, contre {d(apl_debut['population_sous_dense'] / 1e6)} millions ({pct(apl_debut['part'], False)}) en {apl_debut['annee']} (hausse due en partie à l'évolution de la population).",
-], note="« Casse » : notre lecture de ces évolutions. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
+], note="Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
 
 tuiles = f"""
   <div class="tiles">
-    <div class="tile"><div class="v">{ecart(L['lits']['ecart'])}</div><div class="l">lits d'hospitalisation complète ({L['periode'][0]}-{L['periode'][1]})</div></div>
+    <div class="tile"><div class="v">{ecart(L['lits']['ecart'])}</div><div class="l">lits d'hospitalisation complète ({L['periode'][0]}-{L['periode'][1]}), pour {ecart(L['places']['ecart'])} places d'hospitalisation partielle</div></div>
     <div class="tile"><div class="v">{ecart(MA['total']['ecart'])}</div><div class="l">maternités ({MA['periode'][0]}-{MA['periode'][1]})</div></div>
-    <div class="tile"><div class="v">{d(apl_fin['population_sous_dense'] / 1e6)}&nbsp;M</div><div class="l">habitants en commune sous-dotée en généralistes ({apl_fin['annee']})</div></div>
+    <div class="tile"><div class="v">{d(apl_fin['population_sous_dense'] / 1e6)}&nbsp;M</div><div class="l">habitants en commune sous-dotée en généralistes ({apl_fin['annee']}, contre {d(apl_debut['population_sous_dense'] / 1e6)} M en {apl_debut['annee']})</div></div>
     <div class="tile"><div class="v">{pct(em['Chirurgie']['pct'])}</div><div class="l">de lits de chirurgie ({pa0}-{pa1})</div></div>
   </div>"""
 
 entete = f"""
 <header>
   <div class="eyebrow">Services publics de santé · données DREES</div>
-  <h1>Depuis {L['periode'][0]}, {n(abs(L['lits']['ecart']))} lits d'hospitalisation et {abs(MA['total']['ecart'])} maternités en moins, {d(apl_fin['population_sous_dense'] / 1e6)} millions d'habitants en commune sous-dotée en généralistes : l'accès aux généralistes recule</h1>
-  <p class="lead">Ce que disent les statistiques publiques sur l'évolution des moyens de l'hôpital et de l'accès aux soins en France. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
+  <h1>{n(abs(L['lits']['ecart']))} lits d'hospitalisation complète en moins entre {L['periode'][0]} et {L['periode'][1]}, {abs(MA['total']['ecart'])} maternités en moins entre {MA['periode'][0]} et {MA['periode'][1]}, {d(apl_fin['population_sous_dense'] / 1e6)} millions d'habitants en commune sous-dotée en généralistes en {apl_fin['annee']}</h1>
+  <p class="lead">Les moyens de l'hôpital et l'accès aux soins en France, d'après les statistiques publiques. Sur la même période, les places d'hospitalisation partielle augmentent de {n(L['places']['ecart'])}. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
   {tuiles}
 </header>""" + casse
 
@@ -546,7 +546,7 @@ g_hab = barres_divergentes([("Lits d'hospitalisation complète", L["lits"]["pct"
 s_hab = section("0", "Rapporté à la population", f"{d(CS['lits_pour_1000']['fin'], 2)} lits pour 1 000 habitants, contre {d(CS['lits_pour_1000']['debut'], 2)} en {cl0}", g_hab, f"""
   <p class="take">Pendant que les lits d'hospitalisation complète reculent ({pct(L['lits']['pct'])}), la population augmente ({pct(CS['population']['pct'])}) et celle des 75 ans ou plus bien davantage ({pct(CS['plus_75_ans']['pct'])}). Rapporté à la population, le nombre de lits passe de {d(CS['lits_pour_1000']['debut'], 2)} à <strong>{d(CS['lits_pour_1000']['fin'], 2)} pour 1 000 habitants</strong> ({pct(CS['lits_pour_1000']['pct'])}).</p>
   <p>Pour 1 000 personnes de 75 ans ou plus, il passe de {d(CS['lits_pour_1000_plus_75']['debut'])} à <strong>{d(CS['lits_pour_1000_plus_75']['fin'])}</strong> ({pct(CS['lits_pour_1000_plus_75']['pct'])}).</p>
-  {lecture("l'hôpital perd des lits au moment même où la population vieillit.")}
+  {lecture(f"entre {cl0} et {cl1}, les lits d'hospitalisation complète baissent de {pct(L['lits']['pct'], False)} et la population de 75 ans ou plus augmente de {pct(CS['plus_75_ans']['pct'], False)}.")}
   {limite(f"lits au 31 décembre rapportés à la population au 1er janvier suivant (Insee, estimations ; 2025 provisoire) ; tous les patients hospitalisés n'ont pas 75 ans ou plus, le rapport aux 75 ans ou plus illustre l'écart entre l'offre et le vieillissement.")}""")
 
 EL = CS["europe_lits"]
@@ -574,7 +574,7 @@ def partie(ident, titre, intro):
     return f'<div class="partie" id="{ident}"><div class="eyebrow">{titre}</div><p class="lead">{intro}</p></div>'
 
 PARTIES = [
-    ("hopital", "L'hôpital", "Établissements, lits, chirurgie, psychiatrie.", [s_etab, s1, s_hab, s_eu, s_mco, s_psy, s_rea_dep]),
+    ("hopital", "L'hôpital", "Établissements, lits, chirurgie, psychiatrie.", [s_etab, s1, s_hab, s_mco, s_psy, s_rea_dep]),
     ("naissance", "Naître", "Les maternités, leur nombre, leur type, leur répartition.", [s2, s_types, s_taille, s_mat_dep]),
     ("medecins", "Les médecins", "Combien de médecins, où, et à quel âge.", [s_gen, s_age, s_dens, s_spe]),
     ("generalistes", "L'accès au généraliste", "L'accès aux soins de ville, commune par commune.", [s3, s_classes, s_apl_dep, s_apl_hausse]),

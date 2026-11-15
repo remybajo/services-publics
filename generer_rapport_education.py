@@ -44,7 +44,7 @@ s_ec = section("0", "Écoles publiques", f"{n(-EC['ecoles_public']['ecart'])} é
   <p class="take">À la rentrée {a1}, la France compte <strong>{n(EC['ecoles_public']['fin'])}</strong> écoles maternelles et élémentaires publiques, contre {n(EC['ecoles_public']['debut'])} en {a0} : <strong>{n(-EC['ecoles_public']['ecart'])} de moins</strong> ({pct(EC['ecoles_public']['pct'])}). Une partie de cette baisse peut venir de regroupements : entre ces deux rentrées, {n(EC['uai_public_sorties'])} numéros d'écoles publiques ont disparu et {n(EC['uai_public_entrees'])} sont apparus, ce qui arrive par exemple quand une maternelle et une élémentaire fusionnent en une école primaire. Les données ne permettent pas de distinguer fermetures et fusions.</p>
   <p>Dans le même temps, le public compte {pct(EC['eleves_public']['pct'], False)} d'élèves en moins ({n(EC['eleves_public']['debut'])} → {n(EC['eleves_public']['fin'])}), mais {pct(EC['classes_public']['pct'], False)} de classes en plus. Le nombre d'écoles publiques baisse donc plus vite que celui de leurs élèves.</p>
   <p>Les écoles privées sous contrat passent de {n(EC['ecoles_prive']['debut'])} à {n(EC['ecoles_prive']['fin'])} ({pct(EC['ecoles_prive']['pct'])}). La part des élèves du premier degré scolarisés dans le privé passe de {d(se[0]['part_eleves_prive'])}&nbsp;% à {d(se[-1]['part_eleves_prive'])}&nbsp;%.</p>
-  {lecture("l'école publique se concentre dans des établissements moins nombreux ; là où ces baisses sont des fermetures, l'école s'éloigne des familles, même si les classes sont moins chargées (les distances ne sont pas mesurées ici).")}
+  {lecture("là où il s'agit de fermetures, moins d'écoles publiques signifie des trajets plus longs pour certaines familles. Les données ne mesurent pas ces distances.")}
   {limite("101 départements (collectivités d'outre-mer exclues, absentes avant 2019). Une école = un numéro d'établissement présent à la rentrée. Années en abscisse : 09 = 2009.")}""")
 
 g_pet = barres_groupees([(x["rentree"][2:], [x["petites_ecoles_public"] / 1000]) for x in se], ["var(--alerte)"], 12, 2,
@@ -82,7 +82,7 @@ g_seg = courbes([("Collégiens du privé", "var(--alerte)", [x["p_tfav_pr"] for 
 s_seg = section("0", "Mixité sociale", f"{d(ss[-1]['p_tfav_pr'])}&nbsp;% des collégiens du privé sont d'origine très favorisée, contre {d(ss[-1]['p_tfav_pu'])}&nbsp;% dans le public", g_seg, f"""
   <p class="take">En {ss[-1]['annee']}, <strong>{d(ss[-1]['p_tfav_pr'])}&nbsp;%</strong> des collégiens du privé sous contrat sont d'origine sociale très favorisée, contre {d(ss[-1]['p_tfav_pu'])}&nbsp;% des collégiens du public. En {ss[0]['annee']}, c'était {d(ss[0]['p_tfav_pr'])}&nbsp;% et {d(ss[0]['p_tfav_pu'])}&nbsp;%. Sur l'ensemble des collégiens, la part passe de {d(ss[0]['p_tfav'])}&nbsp;% à {d(ss[-1]['p_tfav'])}&nbsp;%.</p>
   <p>À l'inverse, {d(ss[-1]['p_defav_pu'])}&nbsp;% des collégiens du public sont d'origine défavorisée, contre {d(ss[-1]['p_defav_pr'])}&nbsp;% dans le privé. La contribution des écarts entre public et privé à la ségrégation sociale entre collèges passe de {d(ss[0]['contrib_interpupr'])}&nbsp;% à <strong>{d(ss[-1]['contrib_interpupr'])}&nbsp;%</strong>, alors que l'indice global de ségrégation reste stable ({d(ss[0]['i_entropie_tot'], 3)} → {d(ss[-1]['i_entropie_tot'], 3)}).</p>
-  {lecture("le privé sous contrat accueille une population de plus en plus favorisée, et l'écart avec le public se creuse.")}
+  {lecture(f"entre {ss[0]['annee']} et {ss[-1]['annee']}, la part des collégiens d'origine très favorisée augmente de {d(ss[-1]['p_tfav_pr'] - ss[0]['p_tfav_pr'])} points dans le privé et de {d(ss[-1]['p_tfav_pu'] - ss[0]['p_tfav_pu'])} point dans le public.")}
   {limite("indicateur publié par la DEPP, métropole et départements d'outre-mer, catégories sociales non renseignées exclues. Prudence pour 2023 : la façon de remonter la catégorie sociale des parents change cette année-là dans le privé. Le financement public du privé n'est pas chiffré dans ce rapport (pas de données ouvertes).")}""",
                 legende([("Collégiens du privé", "var(--alerte)"), ("Ensemble", "var(--dim)"), ("Collégiens du public", "var(--s1)")]))
 
@@ -176,13 +176,13 @@ tableau = f"""
 </script>"""
 
 # --- Synthèse, fiabilité, sources, assemblage ----------------------------------------------------
-casse = casse_en_chiffres("La casse en chiffres", [
+casse = casse_en_chiffres("En chiffres", [
     f"<strong>{n(-EC['ecoles_public']['ecart'])} écoles publiques en moins</strong> entre {a0} et {a1} ({pct(EC['ecoles_public']['pct'])}), fermetures, fusions et changements de numéro confondus ; moins d'écoles publiques dans {DE['deps_ecoles_public_en_baisse']} départements sur {len(DE['departements'])}.",
     f"<strong>{pct(EC['petites_ecoles_public']['pct'], False)} d'écoles publiques à une ou deux classes</strong> en moins ({n(EC['petites_ecoles_public']['debut'])} → {n(EC['petites_ecoles_public']['fin'])}).",
     f"Collégiens d'origine très favorisée : <strong>{d(ss[-1]['p_tfav_pr'])}&nbsp;%</strong> des collégiens du privé en {ss[-1]['annee']} ({d(ss[0]['p_tfav_pr'])}&nbsp;% en {ss[0]['annee']}), {d(ss[-1]['p_tfav_pu'])}&nbsp;% de ceux du public.",
     f"Indice de position sociale des collèges : <strong>{d(IP['national_prive'])}</strong> dans le privé, {d(IP['national_public'])} dans le public ({IP['rentree']}).",
     f"Supérieur : <strong>{pct(ho['prive']['pct'])}</strong> d'étudiants dans le privé entre {ho['debut']} et {ho['fin']}, contre {pct(ho['public']['pct'])} dans le public ; le privé accueille {d(ho['part_prive_fin'])}&nbsp;% des étudiants.",
-], note=f"« Casse » : notre lecture de ces évolutions. Dans le premier degré public, les élèves sont moins nombreux ({pct(EC['eleves_public']['pct'])}), les classes plus nombreuses ({pct(EC['classes_public']['pct'])}) et moins chargées ({d(se[0]['eleves_par_classe_public'])} → {d(se[-1]['eleves_par_classe_public'])} élèves) ; rapporté aux enfants de moins de 10 ans ({pct(CP['education']['enfants_moins_10']['pct'])}, hors Mayotte), le recul des écoles publiques est de {pct(CP['education']['ecoles_pour_10000_enfants']['pct'], False)}. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
+], note=f"Dans le premier degré public, les élèves sont moins nombreux ({pct(EC['eleves_public']['pct'])}), les classes plus nombreuses ({pct(EC['classes_public']['pct'])}) et moins chargées ({d(se[0]['eleves_par_classe_public'])} → {d(se[-1]['eleves_par_classe_public'])} élèves) ; rapporté aux enfants de moins de 10 ans ({pct(CP['education']['enfants_moins_10']['pct'])}, hors Mayotte), le recul des écoles publiques est de {pct(CP['education']['ecoles_pour_10000_enfants']['pct'], False)}. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
 
 fiab = f"""
 <section id="fiabilite">
@@ -219,8 +219,8 @@ tuiles = f"""
 entete = f"""
 <header>
   <div class="eyebrow">Éducation · données DEPP et SIES</div>
-  <h1>{n(-EC['ecoles_public']['ecart'])} écoles publiques en moins, des collèges privés de plus en plus favorisés, un supérieur privé qui croît bien plus vite que le public depuis 2015</h1>
-  <p class="lead">Ce que disent les données publiques sur l'école, le collège et l'enseignement supérieur. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
+  <h1>Écoles publiques : {n(EC['ecoles_public']['debut'])} en {a0}, {n(EC['ecoles_public']['fin'])} en {a1} ; étudiants du privé : {pct(ho['prive']['pct'])} entre {ho['debut']} et {ho['fin']}, contre {pct(ho['public']['pct'])} dans le public</h1>
+  <p class="lead">Les {n(-EC['ecoles_public']['ecart'])} écoles publiques en moins sont un solde de numéros d'établissement : {n(EC['uai_public_sorties'])} ont disparu et {n(EC['uai_public_entrees'])} sont apparus entre {a0} et {a1}, ce qui comprend des fusions et des changements de numéro. Rapporté aux enfants de moins de 10 ans, le nombre d'écoles publiques baisse de {pct(CP['education']['ecoles_pour_10000_enfants']['pct'], False)}. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
   {bandeau}
   {tuiles}
 </header>""" + casse
@@ -278,8 +278,8 @@ EE, ED = CE["europe_eleves_par_enseignant_primaire"], CE["europe_depense_educati
 pays = [(lib, v["fin"]) for lib, v in EE["pays"].items() if v["fin"] is not None]
 g_ee = barres_h(sorted(pays, key=lambda x: -x[1]), lambda v: d(v, 1), f"Élèves par enseignant dans le primaire, {EE['annee_fin']} (Eurostat)",
                 couleur=lambda i, v: "var(--alerte)" if v == EE["pays"]["France"]["fin"] else "var(--dim)")
-s_ee = section("0", "En Europe", f"{d(EE['pays']['France']['fin'], 1)} élèves par enseignant en primaire : la France au 2ᵉ rang le plus élevé de l'Union, ex æquo avec la Tchéquie" if CE['eleves_ex_aequo_france'] == ['CZ'] and len(CE['eleves_pays_au_dessus']) == 1 else f"{d(EE['pays']['France']['fin'], 1)} élèves par enseignant en primaire", g_ee, f"""
-  <p class="take">En {EE['annee_fin']}, la France compte <strong>{d(EE['pays']['France']['fin'], 1)} élèves par enseignant</strong> dans le primaire ({d(EE['pays']['France']['debut'], 1)} en {EE['annee_debut']}), contre {d(EE['pays']['Union européenne (27)']['fin'], 1)} en moyenne dans l'Union européenne. Seule la Roumanie en compte davantage ; la Tchéquie en compte autant.</p>
+s_ee = section("0", "En Europe", f"{d(EE['pays']['France']['fin'], 1)} élèves par enseignant en primaire : la France au 2ᵉ rang le plus élevé de l'Union, ex æquo avec la Tchéquie (définition différente pour la France selon Eurostat)" if CE['eleves_ex_aequo_france'] == ['CZ'] and len(CE['eleves_pays_au_dessus']) == 1 else f"{d(EE['pays']['France']['fin'], 1)} élèves par enseignant en primaire", g_ee, f"""
+  <p class="take">En {EE['annee_fin']}, la France compte <strong>{d(EE['pays']['France']['fin'], 1)} élèves par enseignant</strong> dans le primaire ({d(EE['pays']['France']['debut'], 1)} en {EE['annee_debut']}), contre {d(EE['pays']['Union européenne (27)']['fin'], 1)} en moyenne dans l'Union européenne. Seule la Roumanie en compte davantage ({d(CE['eleves_valeurs_ue_fin']['RO'], 1)}) ; la Tchéquie en compte autant ({d(CE['eleves_valeurs_ue_fin']['CZ'], 1)}). Eurostat signale une définition différente pour la France.</p>
   {limite("Eurostat : élèves par enseignant (CITE 1, enseignement primaire), tous secteurs ; Eurostat signale une définition différente pour la France. Un ratio élèves par enseignant n'est pas une taille de classe.")}""")
 
 

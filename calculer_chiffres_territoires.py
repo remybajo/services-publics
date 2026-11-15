@@ -8,6 +8,7 @@ Usage : python3 calculer_chiffres_territoires.py
 import json
 import math
 import os
+from collections import defaultdict
 
 OUT = "donnees_propres/territoires"
 MIN_INDICATEURS = 5  # nombre minimal d'indicateurs disponibles pour figurer au classement des cumuls
@@ -91,6 +92,32 @@ def main():
         "departements_non_classes": [o["nom"] for o in liste if o["nb_disponibles"] < MIN_INDICATEURS],
         "min_indicateurs": MIN_INDICATEURS,
         "definition": f"Croisement des fiches de chiffres vérifiées des cinq thèmes (santé, La Poste, éducation, logement, transports) : sept indicateurs départementaux repris sans recalcul (champ « source » = fiche/chemin). Pour chaque indicateur, les départements sont rangés du plus défavorable au plus favorable (sens « haut » : une valeur élevée est défavorable ; « bas » : une valeur basse) ; le « cinquième le plus défavorable » réunit les départements dont la valeur est au moins aussi défavorable que celle du département de rang ⌈N/5⌉ (N = départements disposant de l'indicateur ; ex æquo au seuil inclus). nb_defavorables = nombre d'indicateurs pour lesquels le département est dans ce cinquième. Classement des cumuls limité aux départements disposant d'au moins {MIN_INDICATEURS} indicateurs sur {len(inds)}. Comptage construit pour ce projet, non pondéré : il mesure des écarts entre départements (par construction, un cinquième des départements est « défavorable » pour chaque indicateur), pas un niveau absolu de service ; les indicateurs portent sur des périodes et des champs différents (voir chaque rapport) ; logement : France métropolitaine ; gares : hors Île-de-France, Corse et outre-mer, départements d'au moins 10 gares (même champ que le classement du rapport transports).",
+    }
+    # Tests de robustesse : quart le plus défavorable au lieu du cinquième, et rang moyen (0 = le plus défavorable, 1 = le plus favorable)
+    rangs = defaultdict(list)
+    quart = defaultdict(int)
+    for ind in inds:
+        vals = ind["valeurs"]
+        ordre = sorted(vals, key=lambda c: (-vals[c] if ind["sens"] == "haut" else vals[c], c))
+        seuil_q = vals[ordre[math.ceil(len(ordre) / 4) - 1]]
+        for i, c in enumerate(ordre):
+            # rang relatif ; ex æquo : même rang que le premier de leur groupe
+            premier = next(j for j, x in enumerate(ordre) if vals[x] == vals[c])
+            rangs[c].append(premier / (len(ordre) - 1))
+            if vals[c] >= seuil_q if ind["sens"] == "haut" else vals[c] <= seuil_q:
+                quart[c] += 1
+    groupe = {o["departement"] for o in classes if o["nb_defavorables"] >= 3}
+    q3 = {c for c in (o["departement"] for o in classes) if quart[c] >= 3}
+    moyen = sorted(((sum(rangs[o["departement"]]) / len(rangs[o["departement"]]), o["departement"]) for o in classes))
+    top_moyen = {c for _, c in moyen[:len(groupe)]}
+    chiffres["robustesse"] = {
+        "groupe_quintile": sorted(groupe),
+        "quart_au_moins_3": sorted(q3), "quart_communs": len(groupe & q3),
+        "rang_moyen_premiers": [{"departement": c, "nom": deps[c]["nom"], "rang_moyen": round(r, 3)} for r, c in moyen[:len(groupe)]],
+        "rang_moyen_communs": len(groupe & top_moyen),
+        "hors_groupe_rang_moyen": sorted(deps[c]["nom"] for c in top_moyen - groupe),
+        "groupe_absents_rang_moyen": sorted(deps[c]["nom"] for c in groupe - top_moyen),
+        "definition": "Test 1 : même comptage avec le quart (25 %) le plus défavorable au lieu du cinquième ; départements à au moins 3 indicateurs sur 7. Test 2 : rang moyen de chaque département sur les indicateurs disponibles (0 = le plus défavorable, 1 = le plus favorable ; ex æquo au même rang), et comparaison des N premiers avec le groupe de référence (N = taille du groupe).",
     }
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "chiffres_territoires.json"), "w", encoding="utf-8") as f:

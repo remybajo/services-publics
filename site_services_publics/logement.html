@@ -96,7 +96,7 @@ footer { font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
 a { color: var(--s1); }
 </style>
 <style>
-/* Ton militant : accent d'alerte, synthèse « La casse en chiffres », lectures signalées, limites discrètes */
+/* Mise en forme : accent de couleur, synthèse des chiffres, lectures signalées, limites discrètes */
 :root { --alerte: #c8102e; --alerte-fond: #fdecee; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alerte: #ff5c6f; --alerte-fond: #3a1419; } }
 :root[data-theme="dark"] { --alerte: #ff5c6f; --alerte-fond: #3a1419; }
@@ -153,8 +153,8 @@ details.limite p { margin-top: 6px; font-size: 13px; }
 <div class="wrap"><nav class="menu-site" aria-label="Thèmes"><a class="marque" href="index.html">Services publics</a><a href="sante.html">Santé</a><a href="transports.html">Transports</a><a href="poste.html">La Poste</a><a href="logement.html" aria-current="page">Logement</a><a href="education.html">Éducation</a><a href="territoires.html">Territoires</a></nav>
 <header>
   <div class="eyebrow">Logement social et aides au logement · données SDES, ministère du Logement, Cnaf</div>
-  <h1>Moins de logements sociaux mis en service qu'au milieu des années 2010, moins de ménages aidés : la production de logements sociaux marque le pas</h1>
-  <p class="lead">Ce que disent les données publiques sur le logement social et les aides au logement. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
+  <h1>67 980 logements sociaux mis en service en 2024, contre 86 987 en 2015</h1>
+  <p class="lead">Le logement social et les aides au logement d'après les données publiques. Deux constats distincts, sans lien de cause établi entre eux : la production de logements sociaux a reculé depuis 2015 ; les aides personnelles au logement ont baissé de 1,57&nbsp;Md€ entre 2017 et 2025, en euros courants (avant prise en compte de l'inflation). Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
   
   
   <div class="tiles">
@@ -220,7 +220,7 @@ details.limite p { margin-top: 6px; font-size: 13px; }
 window.addEventListener('beforeprint', function () {
   Array.prototype.forEach.call(document.querySelectorAll('details.limite'), function (d) { d.open = true; });
 });
-</script><section class="casse"><h2>La casse en chiffres</h2><ol><li><strong>−21,9 %</strong> de logements sociaux mis en service en 2024 par rapport à 2015 (86 987 → 67 980, France métropolitaine), −24,3 % par habitant par rapport à 2015, année la plus haute de la période ; en moyenne annuelle (2022-2024 contre 2013-2015), baisse dans 72 départements sur 96.</li><li>En 2024, en France métropolitaine, <strong>28 002 logements sociaux</strong> démolis ou vendus à leur occupant ou à d'autres acquéreurs, soit 41 pour 100 mis en service.</li><li><strong>1,57&nbsp;Md€</strong> d'aides personnelles au logement en moins entre 2017 et 2025 (France entière, euros courants), et 579 milliers de bénéficiaires en moins.</li><li><strong>592 350 foyers</strong> aidés de moins par les Caf entre mars 2017 et mars 2026 (France entière) ; baisse dans 94 territoires sur 102.</li><li><strong>1 140 communes</strong> sur 2 203 déficitaires au sens de la loi SRU (inventaire 2026, France entière), dont 335 carencées.</li></ol><p class="limite">« Casse » : notre lecture de ces évolutions. Le parc social continue toutefois de croître (+15,7 % depuis 2013, rupture de série en 2023 ; 26 888 logements de plus en un an). Les mises en service progressent en 2023 et 2024 (65 574 → 67 980) sans retrouver leur niveau du milieu des années 2010. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.</p></section><nav class="sommaire" aria-label="Sommaire"><a href="#construire">Construire</a><a href="#sortir">Vendre et démolir</a><a href="#sru">La loi SRU</a><a href="#aides">Aider les locataires</a><a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav><div class="partie" id="construire"><div class="eyebrow">Construire</div><p class="lead">Combien de logements sociaux arrivent chaque année.</p></div>
+</script><section class="casse"><h2>En chiffres</h2><ol><li><strong>−21,9 %</strong> de logements sociaux mis en service en 2024 par rapport à 2015 (86 987 → 67 980, France métropolitaine), −24,3 % par habitant par rapport à 2015, année la plus haute de la période ; en moyenne annuelle (2022-2024 contre 2013-2015), baisse dans 72 départements sur 96.</li><li>En 2024, en France métropolitaine, <strong>28 002 logements sociaux</strong> démolis ou vendus à leur occupant ou à d'autres acquéreurs, soit 41 pour 100 mis en service.</li><li><strong>1,57&nbsp;Md€</strong> d'aides personnelles au logement en moins entre 2017 et 2025 (France entière, euros courants), et 579 milliers de bénéficiaires en moins.</li><li><strong>592 350 foyers</strong> aidés de moins par les Caf entre mars 2017 et mars 2026 (France entière) ; baisse dans 94 territoires sur 102.</li><li><strong>1 140 communes</strong> sur 2 203 déficitaires au sens de la loi SRU (inventaire 2026, France entière), dont 335 carencées.</li></ol><p class="limite">Le parc social continue toutefois de croître (+15,7 % depuis 2013, rupture de série en 2023 ; 26 888 logements de plus en un an). Les mises en service progressent en 2023 et 2024 (65 574 → 67 980) sans retrouver leur niveau du milieu des années 2010. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.</p></section><nav class="sommaire" aria-label="Sommaire"><a href="#construire">Construire</a><a href="#sortir">Vendre et démolir</a><a href="#sru">La loi SRU</a><a href="#aides">Aider les locataires</a><a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav><div class="partie" id="construire"><div class="eyebrow">Construire</div><p class="lead">Combien de logements sociaux arrivent chaque année.</p></div>
 <section>
   <h3>1 · Production</h3>
   <h2>21,9 % de logements sociaux mis en service en moins qu'en 2015</h2>
@@ -229,7 +229,7 @@ window.addEventListener('beforeprint', function () {
     <div class="note">
   <p class="take">En 2024, <strong>67 980</strong> logements sociaux ont été mis en service en France métropolitaine, contre 86 987 en 2015, le niveau le plus élevé de la période 2012-2024 : <strong>19 007 de moins</strong> (−21,9 %).</p>
   <p>Le point bas de la période est atteint en 2020 (63 378). Depuis, la production ne retrouve pas son niveau du milieu des années 2010.</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>l'offre nouvelle de logements sociaux reste nettement inférieure à celle du milieu des années 2010.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>en 2024, 67 980 logements sociaux sont mis en service, soit 19 007 de moins qu'en 2015.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> une mise en service n'est pas une construction… <u>en savoir plus</u></summary><p>une mise en service n'est pas une construction : elle comprend les logements construits par les bailleurs, achetés sur plan à des promoteurs (VEFA) ou acquis dans l'ancien. Année de mise en service = année précédant le 1er janvier de la colonne du RPLS (12 = 2012). Départements d'outre-mer non compris.</p></details></div>
   </div>
 </section>
@@ -262,7 +262,7 @@ window.addEventListener('beforeprint', function () {
     <div class="note">
   <p class="take">En 2024, <strong>17 409</strong> logements sociaux ont été démolis et <strong>10 593</strong> vendus à leur occupant ou à d'autres acquéreurs (« autres ventes »), hors ventes entre bailleurs sociaux.</p>
   <p>Rapporté aux 67 980 mises en service de la même année, cela fait <strong>41,2 logements</strong> sortis pour 100 mis en service (39,7 en 2023). S'y ajoutent 13 310 logements vendus à un autre bailleur social.</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>une partie de l'effort de production est absorbée par les démolitions et par les ventes : le parc progresse bien moins vite que ce que les mises en service laissent croire.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>en 2024, 28 002 logements sociaux sont démolis ou vendus, pour 67 980 mis en service.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> deux années seulement (2023 et 2024)… <u>en savoir plus</u></summary><p>deux années seulement (2023 et 2024) : pas de tendance. Le rapport « pour 100 » n'est pas un solde. La source ne précise pas qui achète lors d'une « autre vente ». Une démolition peut s'inscrire dans une opération de rénovation urbaine avec reconstruction. France métropolitaine.</p></details></div>
   </div>
 </section><div class="partie" id="sru"><div class="eyebrow">La loi SRU</div><p class="lead">Les communes déficitaires au regard de la loi SRU.</p></div>
@@ -274,7 +274,7 @@ window.addEventListener('beforeprint', function () {
     <div class="note">
   <p class="take">D'après l'inventaire 2026, <strong>1 140 communes</strong> soumises à la loi SRU sur 2 203 (51,7&nbsp;%) sont déficitaires : elles comptent moins de logements sociaux que leur objectif de 20 ou 25&nbsp;% et ne sont pas exemptées.</p>
   <p><strong>335 communes</strong> sont carencées pour la période 2023-2025 : un arrêté préfectoral de carence a été pris. Le prélèvement net (dont majoration) inscrit à l'inventaire 2026 s'élève à 135,2&nbsp;M€, pour 690 communes.</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>plus d'une commune concernée sur deux n'a pas atteint son obligation, et des centaines paient un prélèvement faute de l'atteindre.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>690 communes paient un prélèvement parce qu'elles n'atteignent pas leur objectif de logements sociaux.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> France entière (dont 85 communes d'outre-mer)… <u>en savoir plus</u></summary><p>France entière (dont 85 communes d'outre-mer). Logements sociaux au 1er janvier 2025. 5 communes sans indication dans l'inventaire (Aire-Sur-La-Lys, Alata, Neuilly-Sur-Seine, Rocbaron, Saint-Dizier). La définition de « déficitaire » varie selon les millésimes : aucune évolution du nombre de communes déficitaires n'est présentée. Nombres absolus : un département compte d'autant plus de communes déficitaires qu'il a de communes soumises à la loi (voir le tableau, colonne « Communes SRU »).</p></details></div>
   </div>
 </section><div class="partie" id="aides"><div class="eyebrow">Aider les locataires</div><p class="lead">Les aides personnelles au logement.</p></div>
@@ -287,7 +287,7 @@ window.addEventListener('beforeprint', function () {
   <p class="take">Les aides personnelles au logement (APL et allocations logement) représentent <strong>16,43&nbsp;Md€</strong> en 2025, contre 18,00&nbsp;Md€ en 2017 (−8,7 %), en euros courants, c'est-à-dire sans tenir compte de la hausse des prix.</p>
   <p>Le nombre de bénéficiaires passe de 6,29 à <strong>5,71 millions</strong> (579 milliers de moins). Le montant mensuel moyen de l'APL passe de 250&nbsp;€ à 235&nbsp;€ ; celui des allocations logement augmente, de 229&nbsp;€ à 244&nbsp;€.</p>
   <p>L'ensemble des aides au logement, qui comprend aussi les avantages fiscaux et les subventions, augmente sur la même période : 41,5 → 45,9&nbsp;Md€.</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>l'aide personnelle au logement, versée sous condition de ressources, recule pendant que l'ensemble des aides au logement, avantages fiscaux compris, progresse.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>en euros courants, les aides personnelles baissent de 1,57&nbsp;Md€ entre 2017 et 2025, alors que l'ensemble des aides au logement, avantages fiscaux compris, passe de 41,5 à 45,9&nbsp;Md€.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> compte du logement 2025 (SDES), France entière, euros courants… <u>en savoir plus</u></summary><p>compte du logement 2025 (SDES), France entière, euros courants ; aucune évolution en euros constants n'est calculée. Années en abscisse : 12 = 2012. Les causes de ces évolutions ne sont pas documentées par la source.</p></details></div>
   </div>
 </section>

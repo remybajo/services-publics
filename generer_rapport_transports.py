@@ -24,6 +24,16 @@ C = json.load(open(FICHE, encoding="utf-8"))
 T, TF, GL, EF, GA, RE, GU, AU, UR = (C[k] for k in ("ter", "ter_finances", "grandes_lignes", "effectifs", "gares",
                                                     "reseau", "guichets", "autocars", "urbain"))
 
+# Dates des jeux SNCF, lues dans leurs métadonnées (portail SNCF Open Data)
+def _date_meta(nom, champ):
+    m = json.load(open(f"donnees_brutes/transports/sncf/meta_{nom}.json", encoding="utf-8"))
+    j = m["metas"]["default"][champ][:10].split("-")
+    return f"{int(j[2])} {('janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre')[int(j[1]) - 1]} {j[0]}"
+
+
+DATE_LIGNES = _date_meta("lignes-par-statut", "data_processed")
+DATE_PV_EN_LIGNE, DATE_PV_TRAITEES = _date_meta("points-vente", "modified"), _date_meta("points-vente", "data_processed")
+
 # --- 1. Offre et suppressions de TER --------------------------------------------------------
 ann = [x["annee"] for x in T["serie"]]
 p0, p1 = T["periode"]
@@ -151,7 +161,7 @@ s_rfn = section("0", "Lignes", f"Le réseau ferré classique géré par SNCF Ré
   <p class="take">Entre {rv0} et {rv1}, le réseau ferré classique géré par SNCF Réseau passe de {n(RV['classique']['debut'])} à <strong>{n(RV['classique']['fin'])} km de lignes</strong> : {n(-RV['classique']['ecart'])} km en moins ({pct(RV['classique']['pct'])}).</p>
   <p>Avec les lignes à grande vitesse, dont trois gérées par d'autres gestionnaires que SNCF Réseau (LISEA, OC'VIA, ERE), présentes dans les données à partir de 2017, le réseau ferré national total recule de {n(-RV['total']['ecart'])} km ({pct(RV['total']['pct'])}), de {n(RV['total']['debut'])} à {n(RV['total']['fin'])} km.</p>
   <p>Plus de la moitié de cette baisse ({d(RV['part_sans_voyageurs_dans_baisse_classique'], 0)}&nbsp;%, soit {n(-sv['ecart'])} km) concerne des petites lignes sans trafic voyageurs (catégories 7 à 9), passées de {n(sv['debut'])} à {n(sv['fin'])} km : des lignes sans trains de voyageurs (fret ou aucune circulation).</p>
-  {lecture("le réseau classique se resserre année après année ; une ligne qui en sort sans être reprise par une région, même sans voyageurs aujourd'hui, est une ligne sur laquelle il deviendra plus difficile de faire rouler un train demain.")}
+  {lecture("une ligne qui sort du réseau sans être reprise par une région devient plus difficile à rouvrir, même si elle n'a plus de voyageurs aujourd'hui.")}
   {limite("ART, onglet « 1.1 - RFN », km de lignes au 31 décembre, par gestionnaire de la maintenance. La source ne dit pas quelles lignes sont sorties de ce périmètre ni pourquoi : fermeture, déclassement ou transfert de gestion à une région (possible depuis la loi d'orientation des mobilités de 2019) ; « sortie du réseau » n'est donc pas synonyme de « fermée ». Couverture incomplète en 2018 selon l'ART. Ces longueurs ne se comparent pas à celles de la section « Réseau » ci-dessous (autre source, autre méthode).")}""")
 
 g_rreg = barres_h([(o["region"], -o["ecart"]) for o in RV["par_region"]], lambda v: n(v) + "&nbsp;km",
@@ -171,7 +181,7 @@ g_freq = courbes([("Passagers-km", "var(--alerte)", [x["indice_pkt"] for x in fs
 s_freq = section("0", "Fréquentation et offre", f"La fréquentation des TER augmente de {d(FO['pkt'], 0)}&nbsp;%, les places offertes de {d(FO['sieges_km'], 0)}&nbsp;%", g_freq, f"""
   <p class="take">Entre {fo0} et {fo1}, la fréquentation des TER (passagers-km) augmente de <strong>{d(FO['pkt'], 0)}&nbsp;%</strong> : quatre fois plus que les trains-km ({pct(FO['trains_km'])}) et deux fois plus que les places offertes (sièges-km, {pct(FO['sieges_km'])}).</p>
   <p>Résultat : les trains sont plus remplis. Le taux d'occupation moyen passe de {d(FO['taux_occupation']['debut'])}&nbsp;% à <strong>{d(FO['taux_occupation']['fin'])}&nbsp;%</strong> (moyenne sur toute la journée et tout le réseau).</p>
-  {lecture("les usagers sont de plus en plus nombreux dans le train régional, mais l'offre ne suit pas au même rythme : plus de monde dans des trains qui n'augmentent pas autant.")}
+  {lecture(f"le taux d'occupation moyen des TER passe de {d(FO['taux_occupation']['debut'])}&nbsp;% à {d(FO['taux_occupation']['fin'])}&nbsp;% entre {fo0} et {fo1} : les places offertes augmentent moins vite que les voyageurs.")}
   {limite(f"ART, onglet « 9.1 », total TER hors Transilien ; {fo1} = dernière année complète. Taux d'occupation moyen sur la journée et le réseau : il ne mesure pas la saturation aux heures de pointe. Intercités transférés aux régions entre 2017 et 2020 comptés en TER (gonfle à la fois l'offre et la fréquentation) ; 2020-2021 marquées par la crise sanitaire.")}""",
                 legende([("Passagers-km", "var(--alerte)"), ("Sièges-km offerts", "var(--s3)"), ("Trains-km", "var(--s1)")]))
 
@@ -191,7 +201,7 @@ s_annul = section("0", "Suppressions de dernière minute", f"TER supprimés au d
   <p class="take">En {ter_f['periode'][1]}, <strong>{d(ter_f['annules_derniere_minute']['fin'])}</strong> TER en moyenne sont supprimés chaque jour au dernier moment ({d(ter_f['serie'][-1]['annules_totaux_jour'])} totalement, {d(ter_f['annules_derniere_minute']['fin'] - ter_f['serie'][-1]['annules_totaux_jour'])} sur une partie du trajet), après la publication du plan de transport de la veille, contre {d(ter_f['annules_derniere_minute']['debut'])} en {ter_f['periode'][0]} ({pct(ter_f['annules_derniere_minute']['pct'])}).</p>
   <p>Rapportée aux trains programmés, la part des TER annulés au dernier moment passe de {d(ter_f['taux_annules_derniere_minute']['debut'], 2)}&nbsp;% ({ter_f['periode'][0]}) à <strong>{d(ter_f['taux_annules_derniere_minute']['fin'], 2)}&nbsp;%</strong> ({ter_f['periode'][1]}). En Île-de-France, celle des Transilien passe de {d(tr_f['taux_annules_derniere_minute']['debut'], 2)}&nbsp;% ({tr_f['periode'][0]}) à {d(tr_f['taux_annules_derniere_minute']['fin'], 2)}&nbsp;% ; celle des Intercités de {d(ic_f['taux_annules_derniere_minute']['debut'], 2)}&nbsp;% ({ic_f['periode'][0]}) à {d(ic_f['taux_annules_derniere_minute']['fin'], 2)}&nbsp;%.</p>
   <p>Les trains retirés avant 16&nbsp;h la veille (déprogrammations) n'apparaissent pas dans la statistique de régularité de la SNCF ; l'ART, elle, les compte à part. Les suppressions de dernière minute, décidées après cette heure, sont comptées par les deux. Aucune des deux sources ne publie de répartition chiffrée des causes de ces suppressions (manque de personnel, de matériel, travaux, grève…) ; la SNCF ne donne que des commentaires mensuels ponctuels.</p>
-  {lecture("ce sont les suppressions les plus pénibles pour les usagers : le train était annoncé la veille et ne vient pas, ou ne va pas jusqu'au bout. Leur part augmente pour les trois types de trains.")}
+  {lecture("une suppression de dernière minute touche des voyageurs qui comptaient sur un train annoncé la veille. Leur part augmente pour les TER, les Transilien et les Intercités.")}
   {limite(f"moyennes de trains par jour (ART). Les trains retirés plus tôt du plan de transport (déprogrammations, y compris pour travaux) baissent : la part totale de TER non circulés est de {d(ter_f['serie'][-1]['part_non_circules'], 2)}&nbsp;% en {ter_f['periode'][1]}, contre {d(ter_f['serie'][0]['part_non_circules'], 2)}&nbsp;% en {ter_f['periode'][0]}. Années atypiques : 2017 (valeur TER basse), 2018, 2019 et 2023 (grèves), 2020 et 2021 (crise sanitaire).")}""",
                     legende([(sv, col) for sv, col, _ in series_fi]))
 
@@ -203,7 +213,7 @@ g_des = barres_h([("Moins de dessertes", DS["gares_en_baisse"]), ("dont plus de 
 s_des = section("0", "Dessertes des gares", f"Près d'une gare sur deux ({d(DS['part_gares_en_baisse'], 0)}&nbsp;%) a perdu des arrêts de trains entre {ds0} et {ds1}", g_des, f"""
   <p class="take">Sur {n(DS['gares_suivies'])} gares, <strong>{n(DS['gares_en_baisse'])}</strong> sont moins desservies en {ds1} qu'en {ds0} ; {n(DS['gares_en_baisse_plus_10pct'])} ont perdu plus de 10&nbsp;% de leurs arrêts, {n(DS['gares_en_baisse_plus_20pct'])} plus de 20&nbsp;%.</p>
   <p>Dans le même temps, le nombre total d'arrêts augmente ({pct(DS['dessertes_total_evol']['pct'])}) et {n(DS['gares_en_hausse'])} gares sont mieux desservies.</p>
-  {lecture("l'offre se concentre : des trains en plus sur certaines lignes et dans certaines gares, des arrêts en moins dans près d'une gare sur deux.")}
+  {lecture(f"le nombre total d'arrêts augmente de {d(DS['dessertes_total_evol']['pct'])}&nbsp;%, mais {n(DS['gares_en_baisse'])} gares sur {n(DS['gares_suivies'])} en perdent : les arrêts supplémentaires se concentrent sur une partie des gares.")}
   {limite(f"nombre de dessertes publié par l'ART, gares présentes en {ds0} et en {ds1} ({DS['gares_absentes_fin']} gares de {ds0} absentes en {ds1}, hors calcul) ; 2020 et 2021 marquées par la crise sanitaire.")}""")
 
 cl = GD["classement_sans_guichet"]
@@ -213,7 +223,7 @@ g_gdep = barres_h([(f"{o['departement']} ({o['gares']} gares)", o["part_sans_gui
 s_gdep = section("0", "Guichets par département", f"Dans {GD['deps_majorite_sans_guichet']} départements sur {GD['nb_deps_classes']}, la majorité des gares n'a pas de guichet", g_gdep, f"""
   <p class="take">Hors Île-de-France, la majorité des gares n'a pas de guichet dans <strong>{GD['deps_majorite_sans_guichet']} départements sur {GD['nb_deps_classes']}</strong> (départements d'au moins 10 gares).</p>
   <p>En tête : département {cl[0]['departement']} ({cl[0]['gares'] - cl[0]['avec_guichet']} gares sur {cl[0]['gares']} sans guichet), {cl[1]['departement']} ({cl[1]['gares'] - cl[1]['avec_guichet']} sur {cl[1]['gares']}), {cl[2]['departement']} ({cl[2]['gares'] - cl[2]['avec_guichet']} sur {cl[2]['gares']}).</p>
-  {lecture(f"dans la plupart des départements, la majorité des gares n'a pas de guichet : on y achète son billet à un automate, sur un écran, ou nulle part (hors Île-de-France, {n(GU['aucun_point_vente'])} gares n'ont aucun point de vente répertorié).")}
+  {lecture(f"dans une gare sans guichet, le billet s'achète à un automate ou en ligne. Hors Île-de-France, {n(GU['aucun_point_vente'])} gares n'ont aucun point de vente répertorié, ni guichet ni automate.")}
   {limite("photographie (points de vente traités en février 2024) : les données ne disent pas combien de guichets ont fermé ; « sans guichet » ne veut pas dire « sans automate » ; départements désignés par leur numéro.")}""")
 
 
@@ -263,13 +273,13 @@ tableau = f"""
 }})();
 </script>"""
 
-casse = casse_en_chiffres("La casse en chiffres", [
+casse = casse_en_chiffres("En chiffres", [
     f"<strong>{n(-RV['classique']['ecart'])} km de lignes classiques</strong> en moins dans le réseau géré par SNCF Réseau entre {rv0} et {rv1} ({pct(RV['classique']['pct'])}), dans toutes les régions ; plus de la moitié sans trafic voyageurs.",
-    f"Fréquentation des TER <strong>{pct(FO['pkt'])}</strong>, places offertes {pct(FO['sieges_km'])}, trains-km {pct(FO['trains_km'])} ({fo0}-{fo1}) : l'offre ne suit pas au même rythme.",
-    f"<strong>Près d'une gare sur deux</strong> ({d(DS['part_gares_en_baisse'], 0)}&nbsp;%) a perdu des arrêts de trains entre {ds0} et {ds1}, alors que le nombre total d'arrêts progresse de {d(DS['dessertes_total_evol']['pct'])}&nbsp;% : l'offre se concentre.",
+    f"Fréquentation des TER <strong>{pct(FO['pkt'])}</strong>, places offertes {pct(FO['sieges_km'])}, trains-km {pct(FO['trains_km'])} ({fo0}-{fo1}).",
+    f"<strong>Près d'une gare sur deux</strong> ({d(DS['part_gares_en_baisse'], 0)}&nbsp;%) a perdu des arrêts de trains entre {ds0} et {ds1}, alors que le nombre total d'arrêts progresse de {d(DS['dessertes_total_evol']['pct'])}&nbsp;%.",
     f"À la SNCF, les contractuels augmentent de <strong>{d(EF['contractuels']['pct'])}&nbsp;%</strong> en deux ans, pendant que les agents au statut baissent de {pct(EF['statut']['pct'], False)} ({EF['periode'][0]}-{EF['periode'][1]}).",
     f"Dans <strong>{GD['deps_majorite_sans_guichet']} départements sur {GD['nb_deps_classes']}</strong> (hors Île-de-France), la majorité des gares n'a pas de guichet (photographie de février 2024).",
-], note="« Casse » : lecture militante de ces évolutions. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport ; les sorties du réseau ne sont pas toutes des fermetures (transferts de gestion aux régions).")
+], note="Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport. Les sorties du réseau ne sont pas toutes des fermetures : elles comprennent les transferts de gestion aux régions.")
 
 fiab = f"""
 <section id="fiabilite">
@@ -278,8 +288,6 @@ fiab = f"""
   <div class="tbl"><table>
     <tr><th>Donnée</th><th>Limite</th><th>Conséquence</th></tr>
     <tr><td>TER (SNCF)</td><td>Suppressions annoncées la veille avant 16 h non comptées ; périmètre complet seulement à partir de 2017</td><td>Suppressions sous-estimées, surtout les jours de grève</td></tr>
-    <tr><td>Financement TER (ART)</td><td>Euros courants ; dernière année complète {a_f[-1]}</td><td>Hausses à relativiser par l'inflation</td></tr>
-    <tr><td>Intercités</td><td>Sélection de liaisons de l'AQST ; transferts de lignes aux régions</td><td>La baisse du total ne mesure pas seulement des suppressions</td></tr>
     <tr><td>Effectifs SNCF</td><td>Tranches d'âge manquantes ou en double de {EF['annees_avec_anomalies'][0]} à {EF['annees_avec_anomalies'][-1]} ; effectifs totaux à partir de 2019</td><td>Seule {EF['periode'][0]}-{EF['periode'][1]} est comparée</td></tr>
     <tr><td>Gares</td><td>Trafic francilien extrapolé ; méthode révisée chaque année</td><td>Évolutions à lire avec prudence</td></tr>
     <tr><td>Guichets, réseau</td><td>Photographies à une date ; rapprochement par code de gare</td><td>Pas d'évolution dans le temps</td></tr>
@@ -287,8 +295,6 @@ fiab = f"""
     <tr><td>Réseau ferré national (ART)</td><td>Km de lignes au 31 décembre par gestionnaire de la maintenance ; ne distingue pas fermeture, déclassement et transfert aux régions ; couverture incomplète en 2018 ; non comparable aux « lignes par statut » de SNCF Réseau</td><td>« Sorti du réseau » n'est pas synonyme de « fermé »</td></tr>
     <tr><td>Fréquentation TER (ART)</td><td>Nombre de voyages non retenu (estimé par la source jusqu'en 2020) ; Intercités transférés comptés en TER ; taux d'occupation moyen sur la journée</td><td>Ne mesure pas la saturation aux heures de pointe</td></tr>
     <tr><td>Dessertes des gares (ART)</td><td>2019-2023 ; gares disparues du jeu hors calcul</td><td>Concentration de l'offre, total des arrêts en hausse</td></tr>
-    <tr><td>Autocars librement organisés</td><td>Services commerciaux ; liaisons domestiques et internationales ; ouverture en août 2015</td><td>Pas un service public ; comparaison à partir de 2016</td></tr>
-    <tr><td>Transports urbains</td><td>Hors Île-de-France ; déclarations des exploitants ; données jusqu'en 2016</td><td>Pas de données récentes</td></tr>
   </table></div>
 </section>"""
 date = open("donnees_brutes/transports/sncf/date_telechargement.txt", encoding="utf-8").read().strip()
@@ -296,7 +302,7 @@ sources = f"""
 <section>
   <h3>Sources</h3>
   <p>SNCF Open Data (téléchargement du {date}, licence ODbL) : régularité mensuelle TER, Intercités et TGV ; répartition par âge de l'effectif ; fréquentation en gares ; lignes par statut (SNCF Réseau) ; points de vente.</p>
-  <p>Autorité de régulation des transports (Licence Ouverte) : données du transport ferroviaire (onglets RFN, TER, Fiabilité et Gares) ; données des services librement organisés d'autocars. Cerema : enquête nationale sur les transports collectifs urbains, 1995-2016 (Licence Ouverte), réalisée par le Gart et l'UTP depuis 2016. Données ART et Cerema téléchargées le {date}.</p>
+  <p>Autorité de régulation des transports (Licence Ouverte) : données du transport ferroviaire (onglets RFN, Offre et fréquentation TER, Fiabilité, Gares), téléchargées le {date}.</p>
   <p>Calculs rejouables : <code>nettoyer_transports.py</code>, <code>calculer_chiffres_transports.py</code> puis <code>generer_rapport_transports.py</code>.</p>
 </section>"""
 
@@ -306,14 +312,15 @@ tuiles = f"""
   <div class="tiles">
     <div class="tile"><div class="v">−{n(-RV['classique']['ecart'])}&nbsp;km</div><div class="l">de lignes classiques gérées par SNCF Réseau ({rv0}-{rv1}), fermetures, déclassements et transferts confondus</div></div>
     <div class="tile"><div class="v">{pct(FO['pkt'])}</div><div class="l">de fréquentation des TER, pour {pct(FO['sieges_km'])} de places offertes ({fo0}-{fo1})</div></div>
-    <div class="tile"><div class="v">{d(GU['part_sans_guichet'], 0)}&nbsp;%</div><div class="l">des gares hors Île-de-France sans guichet</div></div>
+    <div class="tile"><div class="v">{d(GU['part_sans_guichet'], 0)}&nbsp;%</div><div class="l">des gares hors Île-de-France sans guichet (données traitées en février 2024)</div></div>
     <div class="tile"><div class="v">{pct(EF['contractuels']['pct'])}</div><div class="l">de contractuels à la SNCF ({EF['periode'][0]}-{EF['periode'][1]})</div></div>
   </div>"""
 entete = f"""
 <header>
-  <div class="eyebrow">Services publics de transport · données SNCF, ART, Cerema</div>
-  <h1>Des TER de plus en plus remplis, un réseau classique qui rétrécit : l'offre ferroviaire ne suit pas le rythme de la fréquentation</h1>
-  <p class="lead">Ce que disent les données publiques sur le train, les cars et les transports urbains. Chaque chiffre vient d'une source officielle et peut être recalculé ; chaque graphique est accompagné de ses limites.</p>
+  <div class="eyebrow">Services publics de transport · données SNCF et ART</div>
+  <h1>TER : fréquentation {pct(FO['pkt'])} et places offertes {pct(FO['sieges_km'])} entre {fo0} et {fo1} ; réseau classique : {n(-RV['classique']['ecart'])} km de lignes en moins</h1>
+  <p class="lead">Les {n(-RV['classique']['ecart'])} km désignent les lignes sorties du réseau géré par SNCF Réseau entre {rv0} et {rv1}, toutes causes confondues : fermetures, déclassements et transferts de gestion aux régions. Chaque chiffre vient d'une source publique et peut être recalculé ; chaque graphique est accompagné de ses limites.</p>
+  <p class="dates-donnees">Dates des données : réseau ferré, ART, au 31 décembre de chaque année jusqu'en {rv1} ; statut des lignes, SNCF Réseau, traitement du {DATE_LIGNES} ; guichets, SNCF, jeu mis en ligne le {DATE_PV_EN_LIGNE}, données traitées le {DATE_PV_TRAITEES} ; fréquentation et offre des TER, ART, {fo0}-{fo1} ; régularité, SNCF, jusqu'en {p1}.</p>
   {bandeau}
   {tuiles}
 </header>""" + casse

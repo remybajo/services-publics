@@ -49,13 +49,16 @@ def evolution():
         re_ = v.get(("DEP", code, "Relais poste"), {})
         if a0 not in b or a1 not in b:
             continue
+        # Part des bureaux non calculable si une composante manque à la source (agences à Paris) : « non disponible »
+        complet0 = a0 in ag and a0 in re_
+        complet1 = a1 in ag and a1 in re_
         tot1 = b[a1] + ag.get(a1, 0) + re_.get(a1, 0)
         tot0 = b[a0] + ag.get(a0, 0) + re_.get(a0, 0)
         deps.append({"departement": code, "nom": noms.get(code, code), "bureaux_debut": round(b[a0]), "bureaux_fin": round(b[a1]),
                      "pct_bureaux": round(100 * (b[a1] - b[a0]) / b[a0], 1) if b[a0] else None,
-                     "agences_fin": round(ag.get(a1, 0)), "relais_fin": round(re_.get(a1, 0)),
-                     "part_bureaux_debut": round(100 * b[a0] / tot0, 1) if tot0 else None,
-                     "part_bureaux_fin": round(100 * b[a1] / tot1, 1) if tot1 else None})
+                     "agences_fin": round(ag[a1]) if a1 in ag else None, "relais_fin": round(re_[a1]) if a1 in re_ else None,
+                     "part_bureaux_debut": round(100 * b[a0] / tot0, 1) if tot0 and complet0 else None,
+                     "part_bureaux_fin": round(100 * b[a1] / tot1, 1) if tot1 and complet1 else None})
     deps.sort(key=lambda o: (o["pct_bureaux"] if o["pct_bureaux"] is not None else 0))
     return {
         "serie": serie,
@@ -65,7 +68,7 @@ def evolution():
         "deps_minorite_bureaux": sum(1 for o in deps if o["part_bureaux_fin"] is not None and o["part_bureaux_fin"] < 50),
         "deps_minorite_bureaux_debut": sum(1 for o in deps if o["part_bureaux_debut"] is not None and o["part_bureaux_debut"] < 50),
         "periode": [a0, a1],
-        "definition": "Insee, Base permanente des équipements, jeu d'évolution (2015, 2020, 2025, au 1er janvier, géographie au 1er janvier 2026) : bureaux de poste (A206), relais poste (A207), agences postales (A208). Agences postales communales et intercommunales confondues ; total = bureaux + agences + relais (points partenaires exclus). Observation absente (agences postales à Paris) comptée 0. Pour 2016-2021, l'Insee signalait une évolution atypique des relais poste dans six départements, dont trois avec rupture de série (« Précautions d'utilisation », BPE 2016-2021) ; à Paris, les relais passent de 1 en 2015 à 53 en 2020.",
+        "definition": "Insee, Base permanente des équipements, jeu d'évolution (2015, 2020, 2025, au 1er janvier, géographie au 1er janvier 2026) : bureaux de poste (A206), relais poste (A207), agences postales (A208). Agences postales communales et intercommunales confondues ; total = bureaux + agences + relais (points partenaires exclus). Observation absente (agences postales à Paris) : non disponible, et part des bureaux non calculée pour ce département. Pour 2016-2021, l'Insee signalait une évolution atypique des relais poste dans six départements, dont trois avec rupture de série (« Précautions d'utilisation », BPE 2016-2021) ; à Paris, les relais passent de 1 en 2015 à 53 en 2020.",
         "deps_ex_aequo_note": "Classement des baisses : départements à pourcentage égal ex æquo.",
     }
 

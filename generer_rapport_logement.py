@@ -42,7 +42,7 @@ g_mes = barres_groupees([(x["annee_mise_en_service"][2:], [x["mises_en_service"]
 s_mes = section("0", "Production", f"{pct(PA['mises_en_service_vs_pic']['pct'], False)} de logements sociaux mis en service en moins qu'en {pic['annee_mise_en_service']}", g_mes, f"""
   <p class="take">En {der['annee_mise_en_service']}, <strong>{n(der['valeur'])}</strong> logements sociaux ont été mis en service en France métropolitaine, contre {n(pic['valeur'])} en {pic['annee_mise_en_service']}, le niveau le plus élevé de la période {se[0]['annee_mise_en_service']}-{der['annee_mise_en_service']} : <strong>{n(-PA['mises_en_service_vs_pic']['ecart'])} de moins</strong> ({pct(PA['mises_en_service_vs_pic']['pct'])}).</p>
   <p>Le point bas de la période est atteint en {bas['annee_mise_en_service']} ({n(bas['mises_en_service'])}). Depuis, la production ne retrouve pas son niveau du milieu des années 2010.</p>
-  {lecture("l'offre nouvelle de logements sociaux reste nettement inférieure à celle du milieu des années 2010.")}
+  {lecture(f"en {der['annee_mise_en_service']}, {n(der['valeur'])} logements sociaux sont mis en service, soit {n(pic['valeur'] - der['valeur'])} de moins qu'en {pic['annee_mise_en_service']}.")}
   {limite("une mise en service n'est pas une construction : elle comprend les logements construits par les bailleurs, achetés sur plan à des promoteurs (VEFA) ou acquis dans l'ancien. Année de mise en service = année précédant le 1er janvier de la colonne du RPLS (12 = 2012). Départements d'outre-mer non compris.")}""")
 
 g_parc = courbes([("Parc social", "var(--s1)", [x["logements_sociaux"] / 1e6 for x in se])], [x["annee"] for x in se], 4.4, 5.4, 0.2,
@@ -70,7 +70,7 @@ g_sort = barres_h([("Démolitions", s25["demolitions"]), ("Ventes à l'occupant 
 s_sort = section("0", "Ventes et démolitions", f"Pour 100 logements sociaux mis en service en {s25['annee_des_sorties']}, {d(s25['pour_100_mises_en_service'], 0)} ont été démolis ou vendus à leur occupant ou à d'autres acquéreurs", g_sort, f"""
   <p class="take">En {s25['annee_des_sorties']}, <strong>{n(s25['demolitions'])}</strong> logements sociaux ont été démolis et <strong>{n(s25['ventes_occupant_et_autres'])}</strong> vendus à leur occupant ou à d'autres acquéreurs (« autres ventes »), hors ventes entre bailleurs sociaux.</p>
   <p>Rapporté aux {n(s25['mises_en_service_meme_annee'])} mises en service de la même année, cela fait <strong>{d(s25['pour_100_mises_en_service'])} logements</strong> sortis pour 100 mis en service ({d(s24['pour_100_mises_en_service'])} en {s24['annee_des_sorties']}). S'y ajoutent {n(s25['ventes_autre_bailleur'])} logements vendus à un autre bailleur social.</p>
-  {lecture("une partie de l'effort de production est absorbée par les démolitions et par les ventes : le parc progresse bien moins vite que ce que les mises en service laissent croire.")}
+  {lecture(f"en {s25['annee_des_sorties']}, {n(s25['demolitions_et_ventes_occupant_et_autres'])} logements sociaux sont démolis ou vendus, pour {n(s25['mises_en_service_meme_annee'])} mis en service.")}
   {limite(f"deux années seulement ({s24['annee_des_sorties']} et {s25['annee_des_sorties']}) : pas de tendance. Le rapport « pour 100 » n'est pas un solde. La source ne précise pas qui achète lors d'une « autre vente ». Une démolition peut s'inscrire dans une opération de rénovation urbaine avec reconstruction. France métropolitaine.")}""")
 
 # --- 3. La loi SRU ----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ sans = SR["communes_sans_marqueur_deficitaire"]
 s_sru = section("0", "Loi SRU", f"{n(sd['deficitaires_marquees'])} communes sur {n(sd['communes_sru'])} sont déficitaires au regard de la loi SRU", g_sru, f"""
   <p class="take">D'après l'inventaire {sd['millesime']}, <strong>{n(sd['deficitaires_marquees'])} communes</strong> soumises à la loi SRU sur {n(sd['communes_sru'])} ({d(SR['part_deficitaires'])}&nbsp;%) sont déficitaires : elles comptent moins de logements sociaux que leur objectif de 20 ou 25&nbsp;% et ne sont pas exemptées.</p>
   <p><strong>{n(sd['carencees'])} communes</strong> sont carencées pour la période 2023-2025 : un arrêté préfectoral de carence a été pris. Le prélèvement net (dont majoration) inscrit à l'inventaire {sd['millesime']} s'élève à {d(sd['prelevement_net_m'])}&nbsp;M€, pour {n(sd['communes_avec_prelevement'])} communes.</p>
-  {lecture("plus d'une commune concernée sur deux n'a pas atteint son obligation, et des centaines paient un prélèvement faute de l'atteindre.")}
+  {lecture(f"{n(sd['communes_avec_prelevement'])} communes paient un prélèvement parce qu'elles n'atteignent pas leur objectif de logements sociaux.")}
   {limite(f"France entière (dont {SR['drom']['communes_sru']} communes d'outre-mer). Logements sociaux au 1er janvier {sd['annee_inventaire']}. {len(sans)} communes sans indication dans l'inventaire ({', '.join(c.title() for c in sans)}). La définition de « déficitaire » varie selon les millésimes : aucune évolution du nombre de communes déficitaires n'est présentée. Nombres absolus : un département compte d'autant plus de communes déficitaires qu'il a de communes soumises à la loi (voir le tableau, colonne « Communes SRU »).")}""")
 
 # --- 4. Les aides au logement ------------------------------------------------------------------
@@ -94,7 +94,7 @@ s_aides = section("0", "Aides au logement", f"{md(-AI['montant_2017_2025']['ecar
   <p class="take">Les aides personnelles au logement (APL et allocations logement) représentent <strong>{md(AI['montant_2017_2025']['fin'])}</strong> en {sa[-1]['annee']}, contre {md(AI['montant_2017_2025']['debut'])} en 2017 ({pct(AI['montant_2017_2025']['pct'])}), en euros courants, c'est-à-dire sans tenir compte de la hausse des prix.</p>
   <p>Le nombre de bénéficiaires passe de {d(AI['beneficiaires_2017_2025']['debut'], 2)} à <strong>{d(AI['beneficiaires_2017_2025']['fin'], 2)} millions</strong> ({n(-AI['beneficiaires_2017_2025']['ecart_milliers'])} milliers de moins). Le montant mensuel moyen de l'APL passe de {n(a17['moyenne_mensuelle_apl'])}&nbsp;€ à {n(sa[-1]['moyenne_mensuelle_apl'])}&nbsp;€ ; celui des allocations logement augmente, de {n(a17['moyenne_mensuelle_al'])}&nbsp;€ à {n(sa[-1]['moyenne_mensuelle_al'])}&nbsp;€.</p>
   <p>L'ensemble des aides au logement, qui comprend aussi les avantages fiscaux et les subventions, augmente sur la même période : {d(a17['ensemble_aides_md'])} → {d(sa[-1]['ensemble_aides_md'])}&nbsp;Md€.</p>
-  {lecture("l'aide personnelle au logement, versée sous condition de ressources, recule pendant que l'ensemble des aides au logement, avantages fiscaux compris, progresse.")}
+  {lecture(f"en euros courants, les aides personnelles baissent de {md(-AI['montant_2017_2025']['ecart'])} entre 2017 et {sa[-1]['annee']}, alors que l'ensemble des aides au logement, avantages fiscaux compris, passe de {d(a17['ensemble_aides_md'])} à {d(sa[-1]['ensemble_aides_md'])}&nbsp;Md€.")}
   {limite("compte du logement 2025 (SDES), France entière, euros courants ; aucune évolution en euros constants n'est calculée. Années en abscisse : 12 = 2012. Les causes de ces évolutions ne sont pas documentées par la source.")}""")
 
 cs = CA["serie_mars"]
@@ -169,13 +169,13 @@ tableau = f"""
 </script>"""
 
 # --- Synthèse, fiabilité, sources, assemblage ----------------------------------------------------
-casse = casse_en_chiffres("La casse en chiffres", [
+casse = casse_en_chiffres("En chiffres", [
     f"<strong>{pct(PA['mises_en_service_vs_pic']['pct'])}</strong> de logements sociaux mis en service en {der['annee_mise_en_service']} par rapport à {pic['annee_mise_en_service']} ({n(pic['valeur'])} → {n(der['valeur'])}, France métropolitaine), {pct(CP['logement']['mises_en_service_pour_10000']['pct'])} par habitant par rapport à {pic['annee_mise_en_service']}, année la plus haute de la période ; en moyenne annuelle (2022-2024 contre 2013-2015), baisse dans {DE['deps_mises_en_service_en_baisse']} départements sur {len(DE['departements'])}.",
     f"En {s25['annee_des_sorties']}, en France métropolitaine, <strong>{n(s25['demolitions_et_ventes_occupant_et_autres'])} logements sociaux</strong> démolis ou vendus à leur occupant ou à d'autres acquéreurs, soit {d(s25['pour_100_mises_en_service'], 0)} pour 100 mis en service.",
     f"<strong>{md(-AI['montant_2017_2025']['ecart'])}</strong> d'aides personnelles au logement en moins entre 2017 et {sa[-1]['annee']} (France entière, euros courants), et {n(-AI['beneficiaires_2017_2025']['ecart_milliers'])} milliers de bénéficiaires en moins.",
     f"<strong>{n(-CA['foyers']['ecart'])} foyers</strong> aidés de moins par les Caf entre mars 2017 et mars 2026 (France entière) ; baisse dans {CA['territoires_en_baisse']} territoires sur {CA['nb_territoires']}.",
     f"<strong>{n(sd['deficitaires_marquees'])} communes</strong> sur {n(sd['communes_sru'])} déficitaires au sens de la loi SRU (inventaire {sd['millesime']}, France entière), dont {n(sd['carencees'])} carencées.",
-], note=f"« Casse » : notre lecture de ces évolutions. Le parc social continue toutefois de croître ({pct(PA['parc']['pct'])} depuis 2013, rupture de série en 2023 ; {n(PA['hausse_parc_derniere_annee'])} logements de plus en un an). Les mises en service progressent en {se[-2]['annee_mise_en_service']} et {der['annee_mise_en_service']} ({n(se[-3]['mises_en_service'])} → {n(der['valeur'])}) sans retrouver leur niveau du milieu des années 2010. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
+], note=f"Le parc social continue toutefois de croître ({pct(PA['parc']['pct'])} depuis 2013, rupture de série en 2023 ; {n(PA['hausse_parc_derniere_annee'])} logements de plus en un an). Les mises en service progressent en {se[-2]['annee_mise_en_service']} et {der['annee_mise_en_service']} ({n(se[-3]['mises_en_service'])} → {n(der['valeur'])}) sans retrouver leur niveau du milieu des années 2010. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport.")
 
 fiab = f"""
 <section id="fiabilite">
@@ -213,8 +213,8 @@ tuiles = f"""
 entete = f"""
 <header>
   <div class="eyebrow">Logement social et aides au logement · données SDES, ministère du Logement, Cnaf</div>
-  <h1>Moins de logements sociaux mis en service qu'au milieu des années 2010, moins de ménages aidés : la production de logements sociaux marque le pas</h1>
-  <p class="lead">Ce que disent les données publiques sur le logement social et les aides au logement. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
+  <h1>{n(der['valeur'])} logements sociaux mis en service en {der['annee_mise_en_service']}, contre {n(pic['valeur'])} en {pic['annee_mise_en_service']}</h1>
+  <p class="lead">Le logement social et les aides au logement d'après les données publiques. Deux constats distincts, sans lien de cause établi entre eux : la production de logements sociaux a reculé depuis {pic['annee_mise_en_service']} ; les aides personnelles au logement ont baissé de {md(-AI['montant_2017_2025']['ecart'])} entre 2017 et {sa[-1]['annee']}, en euros courants (avant prise en compte de l'inflation). Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
   {bandeau}
   {tuiles}
 </header>""" + casse

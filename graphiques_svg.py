@@ -196,7 +196,7 @@ def section(num, surtitre, titre, graphique, note, leg=""):
 
 # --- Mise en forme « offensive mais inattaquable » (EDR-012) ---------------------------------
 STYLE_MILITANT = """<style>
-/* Ton militant : accent d'alerte, synthèse « La casse en chiffres », lectures signalées, limites discrètes */
+/* Mise en forme : accent de couleur, synthèse des chiffres, lectures signalées, limites discrètes */
 :root { --alerte: #c8102e; --alerte-fond: #fdecee; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alerte: #ff5c6f; --alerte-fond: #3a1419; } }
 :root[data-theme="dark"] { --alerte: #ff5c6f; --alerte-fond: #3a1419; }

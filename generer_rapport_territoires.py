@@ -47,13 +47,14 @@ cartes = [{"libelle": "Cumul", "legende": f"Nombre d'indicateurs (sur {NB}) où 
 cartes += [{"libelle": COURTS[i["cle"]], "legende": i["libelle"], "valeurs": {o["departement"]: o["valeurs"].get(i["cle"]) for o in DEPS},
             "fmt": fmt(i), "inverse": i["sens"] == "bas"} for i in IND]
 top = C["classement_cumul"]
+RB = C["robustesse"]
 maxi = top[0]["nb_defavorables"]
 tetes = [o["nom"] for o in top if o["nb_defavorables"] == maxi]
-s_carte = section_carte("La carte", f"{C['nb_au_moins_3']} départements cumulent au moins trois reculs sur {NB}", carte_departements("carte-territoires", cartes, "Carte du cumul des indicateurs défavorables par département"), f"""
+s_carte = section_carte("La carte", f"{C['nb_au_moins_3']} départements parmi les plus mal placés pour au moins trois indicateurs sur {NB}", carte_departements("carte-territoires", cartes, "Carte du cumul des indicateurs défavorables par département"), f"""
   <p class="take">Sur {C['nb_departements_classes']} départements, <strong>{C['nb_au_moins_3']}</strong> figurent dans le cinquième le plus défavorable pour au moins trois des {NB} indicateurs retenus, et {C['nb_au_moins_4']} pour au moins quatre. À l'inverse, {C['nb_aucun']} n'y figurent pour aucun.</p>
   <p>En tête : {' et '.join(tetes)} ({maxi} indicateurs sur {NB}).</p>
   <p>Survolez ou touchez un département pour lire sa valeur ; les boutons affichent chaque indicateur séparément. Plus la teinte est foncée, plus la situation est défavorable.</p>
-  {lecture("le recul des services publics ne se répartit pas au hasard : les mêmes départements perdent à la fois leurs médecins, leurs bureaux de poste, leurs écoles ou leurs guichets de gare.")}
+  {lecture(f"les écarts ne se répartissent pas au hasard : {' et '.join(tetes)} figurent parmi les départements les plus mal placés pour {maxi} des {NB} indicateurs.")}
   {limite(f"comptage construit pour ce rapport, non pondéré : par construction, un cinquième des départements est « défavorable » pour chaque indicateur ; le cumul mesure donc des écarts entre départements, pas un niveau absolu de service. Les indicateurs portent sur des périodes et des champs différents. Départements disposant d'au moins {C['min_indicateurs']} indicateurs ({', '.join(C['departements_non_classes'])} non classé).")}""")
 
 # --- 2. Le classement ---------------------------------------------------------------------------
@@ -63,7 +64,7 @@ rep = C["repartition_cumul"]
 s_cl = f"""
 <section>
   <h3>0 · Les cumuls</h3>
-  <h2>Les {len(top)} départements qui cumulent le plus de reculs</h2>
+  <h2>Les {len(top)} départements les plus souvent parmi les plus mal placés</h2>
   <div class="row">
     <div class="chart">{g_cl}</div>
     <div class="note">
@@ -155,13 +156,13 @@ def extreme(cle):
             f"{i['plus_favorable']['nom']} : {fmt(i)(i['plus_favorable']['valeur'])}")
 
 
-casse = casse_en_chiffres("Les fractures en chiffres", [
+casse = casse_en_chiffres("En chiffres", [
     f"<strong>{C['nb_au_moins_3']} départements</strong> sur {C['nb_departements_classes']} sont parmi les plus mal placés pour au moins trois indicateurs sur {NB} ; {C['nb_aucun']} ne le sont pour aucun.",
     f"Déserts médicaux, part des habitants en commune sous-dotée en généralistes : <strong>{extreme('sous_dotee')}</strong>.",
     f"Bureaux de poste, évolution en dix ans : <strong>{extreme('bureaux_poste')}</strong>.",
     f"Écoles publiques, évolution depuis 2009 : <strong>{extreme('ecoles')}</strong>.",
     f"Gares sans guichet : <strong>{extreme('guichets')}</strong>.",
-], note="« Fractures » : notre lecture de ces écarts. Chaque indicateur est détaillé, sourcé et assorti de ses limites dans le rapport thématique correspondant ; le cumul est un comptage construit pour ce rapport, dont la méthode est décrite plus bas.")
+], note="Chaque indicateur est détaillé, sourcé et assorti de ses limites dans le rapport thématique correspondant ; le cumul est un comptage construit pour ce rapport, dont la méthode est décrite plus bas.")
 
 fiab = f"""
 <section id="fiabilite">
@@ -174,6 +175,7 @@ fiab = f"""
     <tr><td>Cumul</td><td>Nombre d'indicateurs pour lesquels le département est dans ce cinquième ; aucun poids</td><td>Un indicateur de santé compte autant qu'un indicateur de transport</td></tr>
     <tr><td>Couverture</td><td>Logement : France métropolitaine ; gares : hors Île-de-France, Corse et outre-mer, départements d'au moins 10 gares ; classement limité aux départements disposant d'au moins {C['min_indicateurs']} indicateurs</td><td>{', '.join(C['departements_non_classes'])} non classé ; l'outre-mer et l'Île-de-France sont classés sur moins d'indicateurs</td></tr>
     <tr><td>Périodes</td><td>Les indicateurs ne portent pas sur les mêmes années (2009 à 2026 selon les sources)</td><td>Le cumul n'est pas une évolution datée</td></tr>
+      <tr><td>Robustesse</td><td>Même comptage avec le quart le plus défavorable : {len(RB['quart_au_moins_3'])} départements à au moins 3 indicateurs, dont les {RB['quart_communs']} du groupe de référence ; rang moyen sur les indicateurs disponibles : {RB['rang_moyen_communs']} des {len(RB['groupe_quintile'])} restent parmi les {len(RB['groupe_quintile'])} premiers (entrent {', '.join(RB['hors_groupe_rang_moyen'])} ; sortent {', '.join(RB['groupe_absents_rang_moyen'])})</td><td>Le groupe dépend peu du seuil retenu ; sa composition exacte varie selon la méthode</td></tr>
   </table></div>
 </section>"""
 sources = """
@@ -192,8 +194,8 @@ tuiles = f"""
 entete = f"""
 <header>
   <div class="eyebrow">Territoires · croisement des cinq rapports</div>
-  <h1>Médecins, bureaux de poste, écoles, guichets : {C['nb_au_moins_3']} départements cumulent les reculs</h1>
-  <p class="lead">Les cinq rapports de ce site mesurent chacun un service public. Croisés département par département, ils montrent que les reculs se concentrent sur les mêmes territoires. Chaque chiffre vient des rapports thématiques et peut y être vérifié.</p>
+  <h1>Sept indicateurs de services publics : {C['nb_au_moins_3']} départements parmi les plus mal placés pour au moins trois d'entre eux</h1>
+  <p class="lead">Les cinq rapports de ce site mesurent chacun un service public. Croisés département par département, sept indicateurs (des niveaux et des évolutions, sur des périodes allant de 2009 à 2026) montrent des écarts entre départements, pas des reculs : pour chaque indicateur, un cinquième des départements est par construction classé parmi les plus mal placés. Avec le quart le plus mal placé au lieu du cinquième, les {len(RB['groupe_quintile'])} départements restent tous dans le groupe ; avec le rang moyen, {RB['rang_moyen_communs']} des {len(RB['groupe_quintile'])} restent parmi les {len(RB['groupe_quintile'])} premiers. Chaque chiffre vient des rapports thématiques et peut y être vérifié.</p>
   {tuiles}
 </header>""" + casse
 

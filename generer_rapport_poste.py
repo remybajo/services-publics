@@ -50,7 +50,7 @@ g_part = empile_100_h([(x["annee"], {t: 100 * x[t] / x["total"] for t in TYPES})
 s_part = section("0", "Qui tient le guichet", f"Les bureaux de La Poste ne représentent plus que {d(s2['part_bureaux'], 0)}&nbsp;% des points postaux", g_part, f"""
   <p class="take">En {a1}, <strong>{d(s2['part_bureaux'])}&nbsp;%</strong> des points postaux sont des bureaux de poste tenus par La Poste, contre {d(s0['part_bureaux'])}&nbsp;% en {a0}.</p>
   <p>Les autres sont des agences postales, tenues par une commune ou une intercommunalité, et des relais installés chez des commerçants.</p>
-  <p><em>Notre lecture :</em> la présence postale est de plus en plus assurée par des tiers ; c'est une forme d'externalisation du service public postal. Les données ne disent pas que chaque agence ou relais a remplacé un bureau fermé dans la même commune.</p>
+  <p><em>Notre lecture :</em> confier les guichets à des communes et à des commerçants est une forme d'externalisation du service public postal. Les données ne disent pas que chaque agence ou relais a remplacé un bureau fermé dans la même commune.</p>
   <p><strong>Limites :</strong> part calculée parmi les bureaux, agences et relais recensés par l'Insee (points partenaires exclus) ; la source compte des points, pas les services qu'on y trouve.</p>""",
                  legende([(t, COUL[t]) for t in TYPES]))
 
@@ -112,7 +112,7 @@ s_pop = section("0", "Sans bureau de poste", f"{d(D6['population_sans_bureau'] /
   <p class="take"><strong>{d(D6['population_sans_bureau'] / 1e6)} millions de personnes</strong>, soit {d(D6['part_population_sans_bureau'])}&nbsp;% de la population, vivent dans une commune où La Poste ne liste aucun bureau de poste. C'est le cas de {n(D6['communes_sans_bureau'])} communes et arrondissements municipaux sur {n(D6['communes'])}.</p>
   <p>{top_pop[0]['nom']} : <strong>{d(top_pop[0]['part_pop_sans_bureau'])}&nbsp;%</strong> de la population ; suivent {top_pop[1]['nom']} ({d(top_pop[1]['part_pop_sans_bureau'])}&nbsp;%), {top_pop[2]['nom']} ({d(top_pop[2]['part_pop_sans_bureau'])}&nbsp;%), puis plusieurs départements proches ({top_pop[3]['nom']} {d(top_pop[3]['part_pop_sans_bureau'])}&nbsp;%, {top_pop[4]['nom']} {d(top_pop[4]['part_pop_sans_bureau'])}&nbsp;%). À l'opposé, la part est nulle à {", ".join(zero[:4])}.</p>
   <p>{d(D6['population_sans_point'] / 1e6)} millions de personnes ({d(D6['part_population_sans_point'])}&nbsp;%) vivent dans une commune sans aucun point de contact postal (les points partenaires comptent comme points de contact).</p>
-  {lecture(f"le bureau de poste se concentre dans les villes. Dans {sum(1 for o in deps6 if o['part_pop_sans_bureau'] > 50)} départements, plus de la moitié des habitants vivent dans une commune où La Poste ne liste aucun bureau.")}
+  {lecture(f"les bureaux de poste restent surtout dans les communes les plus peuplées. Dans {sum(1 for o in deps6 if o['part_pop_sans_bureau'] > 50)} départements, plus de la moitié des habitants vivent dans une commune où La Poste ne liste aucun bureau.")}
   {limite("« sans bureau » : aucun bureau de poste listé par La Poste dans la commune (au 08/10/2026), même si une agence postale, un relais ou un bureau voisin existe ; ne mesure ni la distance ni le temps d'accès. Population totale 2022 (fichier APL 2024 de la DREES, géographie non documentée), communes et arrondissements municipaux, hors Mayotte ; taille des communes très inégale.")}""")
 
 top_h = sorted([o for o in D6["departements"] if o["part_points_moins_20h"] is not None], key=lambda o: -o["part_points_moins_20h"])[:15]
@@ -120,14 +120,14 @@ g_hdep = barres_h([(o["nom"], o["part_points_moins_20h"]) for o in top_h], lambd
                   "Part des bureaux, agences et relais ouverts moins de 20 h par semaine, par département", couleur="var(--alerte)", vmax=100)
 s_hdep = section("0", "Ouverture par territoire", f"{top_h[0]['nom']} : {d(top_h[0]['part_points_moins_20h'], 0)}&nbsp;% des points postaux ouvrent moins de 20 h par semaine", g_hdep, f"""
   <p class="take">{top_h[0]['nom']} : <strong>{d(top_h[0]['part_points_moins_20h'])}&nbsp;%</strong> des bureaux, agences et relais y sont ouverts moins de 20 heures par semaine ; {top_h[1]['nom']} ({d(top_h[1]['part_points_moins_20h'])}&nbsp;%) et {top_h[2]['nom']} ({d(top_h[2]['part_points_moins_20h'])}&nbsp;%) suivent.</p>
-  {lecture(f"là où la présence postale repose sur des agences postales, le guichet est le plus souvent ouvert peu d'heures : la moitié des agences ouvrent {hm(ht['Agence postale']['mediane'])} ou moins par semaine.")}
+  {lecture(f"la moitié des agences postales ouvrent {hm(ht['Agence postale']['mediane'])} ou moins par semaine, contre {hm(ht['Bureau de poste']['mediane'])} pour la moitié des bureaux de poste (horaires prévus).")}
   {limite("horaires prévus par La Poste du 19/10/2026 au 18/01/2027 (médiane sur 13 semaines), points dont les horaires sont connus (relais : 90,8&nbsp;% couverts) ; points partenaires exclus.")}""")
 
-casse = casse_en_chiffres("La casse en chiffres", [
+casse = casse_en_chiffres("En chiffres", [
     f"<strong>Près d'un bureau de poste sur trois a disparu</strong> en dix ans : {n(eb['Bureau de poste']['debut'])} en {a0}, {n(eb['Bureau de poste']['fin'])} en {a1} ({pct(eb['Bureau de poste']['pct'])}) ; {d(CP['poste']['bureaux_pour_100000']['fin'])} bureaux pour 100 000 habitants contre {d(CP['poste']['bureaux_pour_100000']['debut'])} ({pct(CP['poste']['bureaux_pour_100000']['pct'])}).",
     f"Les bureaux de La Poste ne sont plus que <strong>{d(s2['part_bureaux'], 0)}&nbsp;%</strong> des points postaux (contre {d(s0['part_bureaux'], 0)}&nbsp;% en {a0}) ; le reste est tenu par des communes, des intercommunalités ou des commerçants.",
     f"Dans <strong>{EV['deps_minorite_bureaux']} départements</strong> sur {len(deps)}, les bureaux sont devenus minoritaires parmi les points postaux, contre {EV['deps_minorite_bureaux_debut']} en {a0}.",
-], note=f"Évolutions {a0}-{a1} (Insee). Le nombre total de points postaux, lui, est presque stable ({pct(EV['total']['pct'])}) : ce qui recule, c'est le bureau tenu par La Poste. Détail, sources et limites dans la suite du rapport.")
+], note=f"Évolutions {a0}-{a1} (Insee). Le nombre total de points postaux (bureaux, agences et relais) varie peu ({pct(EV['total']['pct'])}). Détail, sources et limites dans la suite du rapport.")
 
 # --- 5. Tableau par département ------------------------------------------------------------------
 def cellule(v, fmt):
@@ -212,16 +212,16 @@ bandeau = ('<div class="take" style="border-color:var(--warn)"><strong>Brouillon
            'chiffres non encore validés de façon indépendante, ne pas diffuser.</div>') if BROUILLON else ""
 tuiles = f"""
   <div class="tiles">
-    <div class="tile"><div class="v">{pct(eb['Bureau de poste']['pct'])}</div><div class="l">bureaux de poste ({a0}-{a1})</div></div>
+    <div class="tile"><div class="v">{pct(eb['Bureau de poste']['pct'])}</div><div class="l">bureaux de poste ({a0}-{a1}, Insee)</div></div>
     <div class="tile"><div class="v">{d(D6['population_sans_bureau'] / 1e6)}&nbsp;M</div><div class="l">d'habitants dans une commune sans bureau de poste listé (population 2022, liste d'octobre 2026)</div></div>
-    <div class="tile"><div class="v">{hm(ht['Agence postale']['mediane'])}</div><div class="l">d'ouverture par semaine pour une agence postale (médiane)</div></div>
-    <div class="tile"><div class="v">{d(BO['part_avant_10h'], 0)}&nbsp;%</div><div class="l">des boîtes aux lettres avec dépôt limite avant 10 h</div></div>
+    <div class="tile"><div class="v">{hm(ht['Agence postale']['mediane'])}</div><div class="l">d'ouverture par semaine pour une agence postale (médiane, horaires prévus d'octobre 2026 à janvier 2027)</div></div>
+    <div class="tile"><div class="v">{d(BO['part_avant_10h'], 0)}&nbsp;%</div><div class="l">des boîtes aux lettres avec dépôt limite avant 10 h (liste de septembre 2026)</div></div>
   </div>"""
 entete = f"""
 <header>
   <div class="eyebrow">Service public postal · données Insee et La Poste</div>
-  <h1>Près d'un bureau de poste sur trois a disparu en dix ans : la présence postale passe aux communes et aux commerçants</h1>
-  <p class="lead">Ce que disent les données publiques sur le réseau postal. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
+  <h1>{n(eb['Bureau de poste']['debut'])} bureaux de poste en {a0}, {n(eb['Bureau de poste']['fin'])} en {a1} ; les agences postales passent de {n(eb['Agence postale']['debut'])} à {n(eb['Agence postale']['fin'])}</h1>
+  <p class="lead">Le réseau postal d'après l'Insee ({a0}-{a1}) et d'après les données publiées par La Poste en 2026, deux sources distinctes présentées séparément. Chaque chiffre vient d'une source publique et peut être recalculé ou vérifié à la source ; chaque graphique est accompagné de ses limites.</p>
   {bandeau}
   {tuiles}
 </header>""" + casse
@@ -264,9 +264,8 @@ def partie(ident, titre, intro):
 
 
 PARTIES = [
-    ("reseau", "Le réseau", "Bureaux de poste, agences postales et relais.", [s_res, s_hab, s_part, s_dep, s_pop]),
-    ("ouverture", "L'ouverture au public", "Heures d'ouverture des guichets.", [s_h, s_cl, s_hdep]),
-    ("courrier", "Le courrier", "Les boîtes aux lettres de rue et les facteurs.", [s_bo, s_fac]),
+    ("reseau", f"Évolution du réseau, {a0}-{a1} (Insee)", "Bureaux de poste, agences postales et relais, au 1er janvier de chaque année. Séries de l'Insee, à ne pas comparer aux données de La Poste de la partie suivante.", [s_res, s_hab, s_part, s_dep]),
+    ("aujourdhui", "Le réseau en 2026 (La Poste)", "Photographie des points de contact, des horaires prévus (19 octobre 2026 - 18 janvier 2027) et des boîtes aux lettres, d'après les données publiées par La Poste. Pas d'évolution dans le temps.", [s_pop, s_h, s_cl, s_hdep, s_bo, s_fac]),
 ]
 sommaire = ('<nav class="sommaire" aria-label="Sommaire">' + "".join(f'<a href="#{i}">{t}</a>' for i, t, _, _ in PARTIES)
             + '<a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav>')

@@ -96,7 +96,7 @@ footer { font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
 a { color: var(--s1); }
 </style>
 <style>
-/* Ton militant : accent d'alerte, synthèse « La casse en chiffres », lectures signalées, limites discrètes */
+/* Mise en forme : accent de couleur, synthèse des chiffres, lectures signalées, limites discrètes */
 :root { --alerte: #c8102e; --alerte-fond: #fdecee; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alerte: #ff5c6f; --alerte-fond: #3a1419; } }
 :root[data-theme="dark"] { --alerte: #ff5c6f; --alerte-fond: #3a1419; }
@@ -140,15 +140,16 @@ details.limite p { margin-top: 6px; font-size: 13px; }
 <body>
 <div class="wrap">
 <header>
-  <div class="eyebrow">Services publics de transport · données SNCF, ART, Cerema</div>
-  <h1>Des TER de plus en plus remplis, un réseau classique qui rétrécit : l'offre ferroviaire ne suit pas le rythme de la fréquentation</h1>
-  <p class="lead">Ce que disent les données publiques sur le train, les cars et les transports urbains. Chaque chiffre vient d'une source officielle et peut être recalculé ; chaque graphique est accompagné de ses limites.</p>
+  <div class="eyebrow">Services publics de transport · données SNCF et ART</div>
+  <h1>TER : fréquentation +71,3 % et places offertes +32,9 % entre 2015 et 2024 ; réseau classique : 2 416 km de lignes en moins</h1>
+  <p class="lead">Les 2 416 km désignent les lignes sorties du réseau géré par SNCF Réseau entre 2015 et 2024, toutes causes confondues : fermetures, déclassements et transferts de gestion aux régions. Chaque chiffre vient d'une source publique et peut être recalculé ; chaque graphique est accompagné de ses limites.</p>
+  <p class="dates-donnees">Dates des données : réseau ferré, ART, au 31 décembre de chaque année jusqu'en 2024 ; statut des lignes, SNCF Réseau, traitement du 26 février 2026 ; guichets, SNCF, jeu mis en ligne le 7 janvier 2026, données traitées le 2 février 2024 ; fréquentation et offre des TER, ART, 2015-2024 ; régularité, SNCF, jusqu'en 2025.</p>
   
   
   <div class="tiles">
     <div class="tile"><div class="v">−2 416&nbsp;km</div><div class="l">de lignes classiques gérées par SNCF Réseau (2015-2024), fermetures, déclassements et transferts confondus</div></div>
     <div class="tile"><div class="v">+71,3 %</div><div class="l">de fréquentation des TER, pour +32,9 % de places offertes (2015-2024)</div></div>
-    <div class="tile"><div class="v">70&nbsp;%</div><div class="l">des gares hors Île-de-France sans guichet</div></div>
+    <div class="tile"><div class="v">70&nbsp;%</div><div class="l">des gares hors Île-de-France sans guichet (données traitées en février 2024)</div></div>
     <div class="tile"><div class="v">+43,4 %</div><div class="l">de contractuels à la SNCF (2022-2024)</div></div>
   </div>
 </header>
@@ -208,7 +209,7 @@ details.limite p { margin-top: 6px; font-size: 13px; }
 window.addEventListener('beforeprint', function () {
   Array.prototype.forEach.call(document.querySelectorAll('details.limite'), function (d) { d.open = true; });
 });
-</script><section class="casse"><h2>La casse en chiffres</h2><ol><li><strong>2 416 km de lignes classiques</strong> en moins dans le réseau géré par SNCF Réseau entre 2015 et 2024 (−9,0 %), dans toutes les régions ; plus de la moitié sans trafic voyageurs.</li><li>Fréquentation des TER <strong>+71,3 %</strong>, places offertes +32,9 %, trains-km +17,5 % (2015-2024) : l'offre ne suit pas au même rythme.</li><li><strong>Près d'une gare sur deux</strong> (47&nbsp;%) a perdu des arrêts de trains entre 2019 et 2023, alors que le nombre total d'arrêts progresse de 2,5&nbsp;% : l'offre se concentre.</li><li>À la SNCF, les contractuels augmentent de <strong>43,4&nbsp;%</strong> en deux ans, pendant que les agents au statut baissent de 6,7 % (2022-2024).</li><li>Dans <strong>71 départements sur 79</strong> (hors Île-de-France), la majorité des gares n'a pas de guichet (photographie de février 2024).</li></ol><p class="limite">« Casse » : lecture militante de ces évolutions. Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport ; les sorties du réseau ne sont pas toutes des fermetures (transferts de gestion aux régions).</p></section><nav class="sommaire" aria-label="Sommaire"><a href="#lignes">Les lignes</a><a href="#train-regional">Le train régional</a><a href="#grandes-lignes">Les grandes lignes</a><a href="#cheminots">Les cheminots</a><a href="#gares">Gares et réseau</a><a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav><div class="partie" id="lignes"><div class="eyebrow">Les lignes</div><p class="lead">Le réseau ferré national, année par année.</p></div>
+</script><section class="casse"><h2>En chiffres</h2><ol><li><strong>2 416 km de lignes classiques</strong> en moins dans le réseau géré par SNCF Réseau entre 2015 et 2024 (−9,0 %), dans toutes les régions ; plus de la moitié sans trafic voyageurs.</li><li>Fréquentation des TER <strong>+71,3 %</strong>, places offertes +32,9 %, trains-km +17,5 % (2015-2024).</li><li><strong>Près d'une gare sur deux</strong> (47&nbsp;%) a perdu des arrêts de trains entre 2019 et 2023, alors que le nombre total d'arrêts progresse de 2,5&nbsp;%.</li><li>À la SNCF, les contractuels augmentent de <strong>43,4&nbsp;%</strong> en deux ans, pendant que les agents au statut baissent de 6,7 % (2022-2024).</li><li>Dans <strong>71 départements sur 79</strong> (hors Île-de-France), la majorité des gares n'a pas de guichet (photographie de février 2024).</li></ol><p class="limite">Chaque chiffre est détaillé, sourcé et assorti de ses limites dans la suite du rapport. Les sorties du réseau ne sont pas toutes des fermetures : elles comprennent les transferts de gestion aux régions.</p></section><nav class="sommaire" aria-label="Sommaire"><a href="#lignes">Les lignes</a><a href="#train-regional">Le train régional</a><a href="#grandes-lignes">Les grandes lignes</a><a href="#cheminots">Les cheminots</a><a href="#gares">Gares et réseau</a><a href="#carte">La carte</a><a href="#departements">Votre département</a><a href="#fiabilite">Fiabilité</a></nav><div class="partie" id="lignes"><div class="eyebrow">Les lignes</div><p class="lead">Le réseau ferré national, année par année.</p></div>
 <section>
   <h3>1 · Lignes</h3>
   <h2>Le réseau ferré classique géré par SNCF Réseau compte 2 416 km de lignes de moins qu'en 2015</h2>
@@ -218,7 +219,7 @@ window.addEventListener('beforeprint', function () {
   <p class="take">Entre 2015 et 2024, le réseau ferré classique géré par SNCF Réseau passe de 26 778 à <strong>24 362 km de lignes</strong> : 2 416 km en moins (−9,0 %).</p>
   <p>Avec les lignes à grande vitesse, dont trois gérées par d'autres gestionnaires que SNCF Réseau (LISEA, OC'VIA, ERE), présentes dans les données à partir de 2017, le réseau ferré national total recule de 1 662 km (−5,8 %), de 28 808 à 27 146 km.</p>
   <p>Plus de la moitié de cette baisse (58&nbsp;%, soit 1 391 km) concerne des petites lignes sans trafic voyageurs (catégories 7 à 9), passées de 3 111 à 1 721 km : des lignes sans trains de voyageurs (fret ou aucune circulation).</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>le réseau classique se resserre année après année ; une ligne qui en sort sans être reprise par une région, même sans voyageurs aujourd'hui, est une ligne sur laquelle il deviendra plus difficile de faire rouler un train demain.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>une ligne qui sort du réseau sans être reprise par une région devient plus difficile à rouvrir, même si elle n'a plus de voyageurs aujourd'hui.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> ART, onglet « 1.1 - RFN », km de lignes au 31 décembre, par gestionnaire de la maintenance… <u>en savoir plus</u></summary><p>ART, onglet « 1.1 - RFN », km de lignes au 31 décembre, par gestionnaire de la maintenance. La source ne dit pas quelles lignes sont sorties de ce périmètre ni pourquoi : fermeture, déclassement ou transfert de gestion à une région (possible depuis la loi d'orientation des mobilités de 2019) ; « sortie du réseau » n'est donc pas synonyme de « fermée ». Couverture incomplète en 2018 selon l'ART. Ces longueurs ne se comparent pas à celles de la section « Réseau » ci-dessous (autre source, autre méthode).</p></details></div>
   </div>
 </section>
@@ -250,7 +251,7 @@ window.addEventListener('beforeprint', function () {
     <div class="note">
   <p class="take">Entre 2015 et 2024, la fréquentation des TER (passagers-km) augmente de <strong>71&nbsp;%</strong> : quatre fois plus que les trains-km (+17,5 %) et deux fois plus que les places offertes (sièges-km, +32,9 %).</p>
   <p>Résultat : les trains sont plus remplis. Le taux d'occupation moyen passe de 25,5&nbsp;% à <strong>32,8&nbsp;%</strong> (moyenne sur toute la journée et tout le réseau).</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>les usagers sont de plus en plus nombreux dans le train régional, mais l'offre ne suit pas au même rythme : plus de monde dans des trains qui n'augmentent pas autant.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>le taux d'occupation moyen des TER passe de 25,5&nbsp;% à 32,8&nbsp;% entre 2015 et 2024 : les places offertes augmentent moins vite que les voyageurs.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> ART, onglet « 9.1 », total TER hors Transilien… <u>en savoir plus</u></summary><p>ART, onglet « 9.1 », total TER hors Transilien ; 2024 = dernière année complète. Taux d'occupation moyen sur la journée et le réseau : il ne mesure pas la saturation aux heures de pointe. Intercités transférés aux régions entre 2017 et 2020 comptés en TER (gonfle à la fois l'offre et la fréquentation) ; 2020-2021 marquées par la crise sanitaire.</p></details></div>
   </div>
 </section>
@@ -274,7 +275,7 @@ window.addEventListener('beforeprint', function () {
   <p class="take">En 2025, <strong>165,7</strong> TER en moyenne sont supprimés chaque jour au dernier moment (106,7 totalement, 59,0 sur une partie du trajet), après la publication du plan de transport de la veille, contre 108,5 en 2016 (+52,6 %).</p>
   <p>Rapportée aux trains programmés, la part des TER annulés au dernier moment passe de 1,85&nbsp;% (2016) à <strong>2,39&nbsp;%</strong> (2025). En Île-de-France, celle des Transilien passe de 4,01&nbsp;% (2017) à 5,13&nbsp;% ; celle des Intercités de 1,05&nbsp;% (2016) à 1,87&nbsp;%.</p>
   <p>Les trains retirés avant 16&nbsp;h la veille (déprogrammations) n'apparaissent pas dans la statistique de régularité de la SNCF ; l'ART, elle, les compte à part. Les suppressions de dernière minute, décidées après cette heure, sont comptées par les deux. Aucune des deux sources ne publie de répartition chiffrée des causes de ces suppressions (manque de personnel, de matériel, travaux, grève…) ; la SNCF ne donne que des commentaires mensuels ponctuels.</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>ce sont les suppressions les plus pénibles pour les usagers : le train était annoncé la veille et ne vient pas, ou ne va pas jusqu'au bout. Leur part augmente pour les trois types de trains.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>une suppression de dernière minute touche des voyageurs qui comptaient sur un train annoncé la veille. Leur part augmente pour les TER, les Transilien et les Intercités.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> moyennes de trains par jour (ART)… <u>en savoir plus</u></summary><p>moyennes de trains par jour (ART). Les trains retirés plus tôt du plan de transport (déprogrammations, y compris pour travaux) baissent : la part totale de TER non circulés est de 4,08&nbsp;% en 2025, contre 4,80&nbsp;% en 2016. Années atypiques : 2017 (valeur TER basse), 2018, 2019 et 2023 (grèves), 2020 et 2021 (crise sanitaire).</p></details></div>
   </div>
 </section>
@@ -318,7 +319,7 @@ window.addEventListener('beforeprint', function () {
     <div class="note">
   <p class="take">Sur 2 772 gares, <strong>1 301</strong> sont moins desservies en 2023 qu'en 2019 ; 436 ont perdu plus de 10&nbsp;% de leurs arrêts, 198 plus de 20&nbsp;%.</p>
   <p>Dans le même temps, le nombre total d'arrêts augmente (+2,5 %) et 1 468 gares sont mieux desservies.</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>l'offre se concentre : des trains en plus sur certaines lignes et dans certaines gares, des arrêts en moins dans près d'une gare sur deux.</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>le nombre total d'arrêts augmente de 2,5&nbsp;%, mais 1 301 gares sur 2 772 en perdent : les arrêts supplémentaires se concentrent sur une partie des gares.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> nombre de dessertes publié par l'ART, gares présentes en 2019 et en 2023 (52 gares de 2019 absentes en 2023, hors calcul)… <u>en savoir plus</u></summary><p>nombre de dessertes publié par l'ART, gares présentes en 2019 et en 2023 (52 gares de 2019 absentes en 2023, hors calcul) ; 2020 et 2021 marquées par la crise sanitaire.</p></details></div>
   </div>
 </section>
@@ -342,7 +343,7 @@ window.addEventListener('beforeprint', function () {
     <div class="note">
   <p class="take">Hors Île-de-France, la majorité des gares n'a pas de guichet dans <strong>71 départements sur 79</strong> (départements d'au moins 10 gares).</p>
   <p>En tête : département 90 (11 gares sur 12 sans guichet), 68 (59 sur 65), 21 (30 sur 34).</p>
-  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>dans la plupart des départements, la majorité des gares n'a pas de guichet : on y achète son billet à un automate, sur un écran, ou nulle part (hors Île-de-France, 1 186 gares n'ont aucun point de vente répertorié).</p></div>
+  <div class="lecture"><span class="titre-lecture">Notre lecture</span><p>dans une gare sans guichet, le billet s'achète à un automate ou en ligne. Hors Île-de-France, 1 186 gares n'ont aucun point de vente répertorié, ni guichet ni automate.</p></div>
   <details class="limite"><summary><strong>Limites :</strong> photographie (points de vente traités en février 2024)… <u>en savoir plus</u></summary><p>photographie (points de vente traités en février 2024) : les données ne disent pas combien de guichets ont fermé ; « sans guichet » ne veut pas dire « sans automate » ; départements désignés par leur numéro.</p></details></div>
   </div>
 </section>
@@ -387,8 +388,6 @@ window.addEventListener('beforeprint', function () {
   <div class="tbl"><table>
     <tr><th>Donnée</th><th>Limite</th><th>Conséquence</th></tr>
     <tr><td>TER (SNCF)</td><td>Suppressions annoncées la veille avant 16 h non comptées ; périmètre complet seulement à partir de 2017</td><td>Suppressions sous-estimées, surtout les jours de grève</td></tr>
-    <tr><td>Financement TER (ART)</td><td>Euros courants ; dernière année complète 2024</td><td>Hausses à relativiser par l'inflation</td></tr>
-    <tr><td>Intercités</td><td>Sélection de liaisons de l'AQST ; transferts de lignes aux régions</td><td>La baisse du total ne mesure pas seulement des suppressions</td></tr>
     <tr><td>Effectifs SNCF</td><td>Tranches d'âge manquantes ou en double de 2015 à 2021 ; effectifs totaux à partir de 2019</td><td>Seule 2022-2024 est comparée</td></tr>
     <tr><td>Gares</td><td>Trafic francilien extrapolé ; méthode révisée chaque année</td><td>Évolutions à lire avec prudence</td></tr>
     <tr><td>Guichets, réseau</td><td>Photographies à une date ; rapprochement par code de gare</td><td>Pas d'évolution dans le temps</td></tr>
@@ -396,8 +395,6 @@ window.addEventListener('beforeprint', function () {
     <tr><td>Réseau ferré national (ART)</td><td>Km de lignes au 31 décembre par gestionnaire de la maintenance ; ne distingue pas fermeture, déclassement et transfert aux régions ; couverture incomplète en 2018 ; non comparable aux « lignes par statut » de SNCF Réseau</td><td>« Sorti du réseau » n'est pas synonyme de « fermé »</td></tr>
     <tr><td>Fréquentation TER (ART)</td><td>Nombre de voyages non retenu (estimé par la source jusqu'en 2020) ; Intercités transférés comptés en TER ; taux d'occupation moyen sur la journée</td><td>Ne mesure pas la saturation aux heures de pointe</td></tr>
     <tr><td>Dessertes des gares (ART)</td><td>2019-2023 ; gares disparues du jeu hors calcul</td><td>Concentration de l'offre, total des arrêts en hausse</td></tr>
-    <tr><td>Autocars librement organisés</td><td>Services commerciaux ; liaisons domestiques et internationales ; ouverture en août 2015</td><td>Pas un service public ; comparaison à partir de 2016</td></tr>
-    <tr><td>Transports urbains</td><td>Hors Île-de-France ; déclarations des exploitants ; données jusqu'en 2016</td><td>Pas de données récentes</td></tr>
   </table></div>
 </section>
 <script>
@@ -408,7 +405,7 @@ window.addEventListener('beforeprint', function () {
 <section>
   <h3>Sources</h3>
   <p>SNCF Open Data (téléchargement du 2026-10-20, licence ODbL) : régularité mensuelle TER, Intercités et TGV ; répartition par âge de l'effectif ; fréquentation en gares ; lignes par statut (SNCF Réseau) ; points de vente.</p>
-  <p>Autorité de régulation des transports (Licence Ouverte) : données du transport ferroviaire (onglets RFN, TER, Fiabilité et Gares) ; données des services librement organisés d'autocars. Cerema : enquête nationale sur les transports collectifs urbains, 1995-2016 (Licence Ouverte), réalisée par le Gart et l'UTP depuis 2016. Données ART et Cerema téléchargées le 2026-10-20.</p>
+  <p>Autorité de régulation des transports (Licence Ouverte) : données du transport ferroviaire (onglets RFN, Offre et fréquentation TER, Fiabilité, Gares), téléchargées le 2026-10-20.</p>
   <p>Calculs rejouables : <code>nettoyer_transports.py</code>, <code>calculer_chiffres_transports.py</code> puis <code>generer_rapport_transports.py</code>.</p>
 </section>
 </div>
